@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleHelp, Printer, X, UserRound } from "lucide-react";
+import { CircleHelp, Printer, X, UserRound, Send } from "lucide-react";
 
 
 export default function Home() {
@@ -52,7 +52,7 @@ export default function Home() {
         <div className="max-w-[1200px] mx-auto px-8 py-8 space-y-6">
 
           {/* AI Message */}
-          <div className="flex items-start gap-3 pl-2">
+          <div className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-full bg-[#3157F6] text-white flex items-center justify-center text-sm font-semibold shrink-0">
               AI
             </div>
@@ -71,7 +71,7 @@ export default function Home() {
           </div>
 
           {/* User Message */}
-          <div className="flex justify-end items-start gap-3 pr-2">
+          <div className="flex justify-end items-start gap-3">
             <div className="max-w-[520px] rounded-xl bg-[#344054] px-5 py-4 shadow-sm">
               <p className="text-[16px] leading-relaxed text-white">
                 I need business cards for my construction company.
@@ -91,9 +91,19 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t">
-        <div className="max-w-6xl mx-auto px-8 py-4">
-          Input Area
+      <footer className="bg-white border-t border-gray-200">
+        <div className="max-w-[1200px] mx-auto px-8 py-4">
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Not sure what to print? Ask me anything....."
+              className="flex-1 h-14 rounded-xl border-2 border-[#3157F6] px-4 text-[15px] text-gray-900 placeholder:text-gray-500 outline-none"
+            />
+
+            <button className="w-14 h-14 rounded-xl bg-[#3157F6] text-white flex items-center justify-center hover:bg-[#8EA2FF] transition cursor-pointer">
+              <Send size={24} strokeWidth={2.2} />
+            </button>
+          </div>
         </div>
       </footer>
     </main>
