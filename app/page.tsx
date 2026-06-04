@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleHelp, Printer, X } from "lucide-react";
+import { CircleHelp, Printer, X, UserRound } from "lucide-react";
 
 
 export default function Home() {
@@ -49,26 +49,46 @@ export default function Home() {
 
       {/* Chat Area */}
       <section className="flex-1 overflow-y-auto">
-  <div className="max-w-[1200px] mx-auto px-8 py-8">
-    <div className="flex items-start gap-3">
-      <div className="w-9 h-9 rounded-full bg-[#3157F6] text-white flex items-center justify-center text-sm font-semibold shrink-0">
-        AI
-      </div>
+        <div className="max-w-[1200px] mx-auto px-8 py-8 space-y-6">
 
-      <div className="max-w-[720px] rounded-xl bg-white border border-gray-200 px-5 py-4 shadow-sm">
-        <p className="text-[16px] leading-relaxed text-gray-900">
-          Hello! I&apos;m your AI Print Assistant. I can help you with printing
-          services, paper types, file formats, finishing options, turnaround
-          times, and more. How can I assist you today?
-        </p>
+          {/* AI Message */}
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-full bg-[#3157F6] text-white flex items-center justify-center text-sm font-semibold shrink-0">
+              AI
+            </div>
 
-        <p className="text-xs text-gray-500 mt-3">
-          11:56 AM
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
+            <div className="max-w-[720px] rounded-xl bg-white border border-gray-200 px-5 py-4 shadow-sm">
+              <p className="text-[16px] leading-relaxed text-gray-900">
+                Hello! I&apos;m your AI Print Assistant. I can help you with printing
+                services, paper types, file formats, finishing options, turnaround
+                times, and more. How can I assist you today?
+              </p>
+
+              <p className="text-xs text-gray-500 mt-3">
+                11:56 AM
+              </p>
+            </div>
+          </div>
+
+          {/* User Message */}
+          <div className="flex justify-end items-start gap-3">
+            <div className="max-w-[720px] rounded-xl bg-[#344054] px-5 py-4 shadow-sm">
+              <p className="text-[16px] leading-relaxed text-white">
+                I need business cards for my construction company.
+              </p>
+
+              <p className="text-xs text-gray-200 mt-3">
+                11:57 AM
+              </p>
+            </div>
+
+            <div className="w-9 h-9 rounded-full bg-[#344054] text-white flex items-center justify-center shrink-0">
+              <UserRound size={18} />
+            </div>
+          </div>
+
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="bg-white border-t">
