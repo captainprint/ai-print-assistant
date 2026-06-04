@@ -52,12 +52,12 @@ export default function Home() {
         <div className="max-w-[1200px] mx-auto px-8 py-8 space-y-6">
 
           {/* AI Message */}
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-3 pl-2">
             <div className="w-9 h-9 rounded-full bg-[#3157F6] text-white flex items-center justify-center text-sm font-semibold shrink-0">
               AI
             </div>
 
-            <div className="max-w-[720px] rounded-xl bg-white border border-gray-200 px-5 py-4 shadow-sm">
+            <div className="max-w-[520px] rounded-xl bg-white border border-gray-200 px-5 py-4 shadow-sm">
               <p className="text-[16px] leading-relaxed text-gray-900">
                 Hello! I&apos;m your AI Print Assistant. I can help you with printing
                 services, paper types, file formats, finishing options, turnaround
@@ -71,8 +71,8 @@ export default function Home() {
           </div>
 
           {/* User Message */}
-          <div className="flex justify-end items-start gap-3">
-            <div className="max-w-[720px] rounded-xl bg-[#344054] px-5 py-4 shadow-sm">
+          <div className="flex justify-end items-start gap-3 pr-2">
+            <div className="max-w-[520px] rounded-xl bg-[#344054] px-5 py-4 shadow-sm">
               <p className="text-[16px] leading-relaxed text-white">
                 I need business cards for my construction company.
               </p>
