@@ -22,11 +22,11 @@ export default function Home() {
             </div>
 
             <div>
-              <h1 className="text-[28px] leading-tight font-bold text-gray-950">
+              <h1 className="text-[22px] leading-tight font-bold text-gray-950">
                 AI Print Assistant
               </h1>
 
-              <p className="text-[16px] text-gray-500 mt-1">
+              <p className="text-[14px] text-gray-500 mt-1">
                 Online • Ready to help
               </p>
             </div>
