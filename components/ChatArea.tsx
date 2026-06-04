@@ -14,7 +14,7 @@ export default function ChatArea() {
 
     return (
         <section className="flex-1 overflow-y-auto">
-            <div className="max-w-[900px] mx-auto px-8 py-8 pb-8 space-y-6">
+            <div className="max-w-[900px] mx-auto px-8 py-8 pb-4 space-y-6">
                 <MessageBubble
                     role="ai"
                     message="Hello! I'm your AI Print Assistant. I can help you with printing services, paper types, file formats, finishing options, turnaround times, and more. How can I assist you today?"
