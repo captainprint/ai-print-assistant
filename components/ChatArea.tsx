@@ -18,9 +18,14 @@ export default function ChatArea({
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
+    const timer = setTimeout(() => {
+      bottomRef.current?.scrollIntoView({
+        behavior: "auto",
+        block: "end",
+      });
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [messages]);
 
   const lastMessage = messages[messages.length - 1];

@@ -27,6 +27,24 @@ export default function Home() {
         "Sure! For business cards, I can help you choose the right size, paper type, finish, quantity, and turnaround time. Do you want something standard and affordable, or something premium like foil, raised spot UV, or soft touch?",
       time: "11:58 AM",
     },
+    {
+      role: "ai",
+      message:
+        "Hello! I'm your AI Print Assistant. I can help you with printing services, paper types, file formats, finishing options, turnaround times, and more. How can I assist you today?",
+      time: "11:56 AM",
+    },
+    {
+      role: "user",
+      message:
+        "I need business cards. Can you help me with that?",
+      time: "11:57 AM",
+    },
+    {
+      role: "ai",
+      message:
+        "Sure! For business cards, I can help you choose the right size, paper type, finish, quantity, and turnaround time. Do you want something standard and affordable, or something premium like foil, raised spot UV, or soft touch?",
+      time: "11:58 AM",
+    },
   ]);
 
   return (
