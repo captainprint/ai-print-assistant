@@ -18,14 +18,26 @@ export default function ChatArea({
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const scrollToBottom = () => {
       bottomRef.current?.scrollIntoView({
         behavior: "auto",
         block: "end",
       });
-    }, 100);
+    };
 
-    return () => clearTimeout(timer);
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === "ai-widget-opened") {
+        setTimeout(scrollToBottom, 100);
+      }
+    };
+
+    scrollToBottom();
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
   }, [messages]);
 
   const lastMessage = messages[messages.length - 1];
@@ -33,7 +45,7 @@ export default function ChatArea({
 
   return (
     <section className="flex-1 overflow-y-auto">
-      <div className="max-w-[900px] mx-auto px-8 py-8 pb-32 space-y-6">
+      <div className="max-w-[900px] mx-auto px-8 py-8 pb-6 space-y-6">
         {messages.map((message, index) => (
           <MessageBubble
             key={index}
