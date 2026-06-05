@@ -45,7 +45,7 @@ export default function MessageBubble({
 
   return (
     <div className="flex justify-end items-start gap-3">
-      <div className="max-w-[320px] rounded-xl bg-[#344054] px-5 py-4 shadow-sm">
+      <div className="max-w-[320px] rounded-xl bg-[#344054] px-5 py-4 shadow-sm break-words">
         <p className="text-white">{message}</p>
 
         <p className="text-xs text-gray-200 mt-3">
@@ -53,7 +53,7 @@ export default function MessageBubble({
         </p>
       </div>
 
-      <div className="w-9 h-9 rounded-full bg-[#344054] text-white flex items-center justify-center">
+      <div className="w-9 h-9 shrink-0 rounded-full bg-[#344054] text-white flex items-center justify-center">
         <UserRound size={18} />
       </div>
     </div>
