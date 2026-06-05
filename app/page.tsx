@@ -6,9 +6,15 @@ import ChatArea from "@/components/ChatArea";
 import ChatInput from "@/components/ChatInput";
 import type { Message } from "@/types/message";
 
+function getCurrentTime() {
+  return new Date().toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
 
 export default function Home() {
-  const [messages] = useState<Message[]>([
+  const [messages, setMessages] = useState<Message[]>([
     {
       role: "ai",
       message:
@@ -47,11 +53,21 @@ export default function Home() {
     },
   ]);
 
+  const handleSendMessage = (message: string) => {
+    const userMessage: Message = {
+      role: "user",
+      message,
+      time: getCurrentTime(),
+    };
+
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+  };
+
   return (
     <main className="h-screen flex flex-col bg-[#f6f7f9] overflow-hidden">
       <Header />
       <ChatArea messages={messages} />
-      <ChatInput />
+      <ChatInput onSendMessage={handleSendMessage} />
     </main>
   );
 }
