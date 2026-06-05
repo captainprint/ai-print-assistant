@@ -2,13 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble";
-import type { Message } from "../types/message";
+import type { Message } from "@/types/message";
 
-const suggestions = [
-  "Show me premium options",
-  "What paper do you recommend?",
-  "Talk to a print specialist",
-];
 
 type Props = {
   messages: Message[];
@@ -19,6 +14,14 @@ export default function ChatArea({
   messages,
   onSuggestionClick,
 }: Props) {
+
+  const lastMessage = messages[messages.length - 1];
+
+  const latestSuggestions = lastMessage?.suggestions || [];
+
+  const shouldShowSuggestions =
+    lastMessage?.role === "ai" &&
+    latestSuggestions.length > 0;
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -45,8 +48,7 @@ export default function ChatArea({
     };
   }, [messages]);
 
-  const lastMessage = messages[messages.length - 1];
-  const shouldShowSuggestions = lastMessage?.role === "ai";
+
 
   return (
     <section className="flex-1 overflow-y-auto">
@@ -62,7 +64,7 @@ export default function ChatArea({
 
         {shouldShowSuggestions && (
           <div className="ml-12 flex flex-wrap gap-3">
-            {suggestions.map((question) => (
+            {latestSuggestions.map((question) => (
               <button
                 key={question}
                 onClick={() => onSuggestionClick(question)}

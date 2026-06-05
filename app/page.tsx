@@ -20,38 +20,31 @@ export default function Home() {
       message:
         "Hello! I'm your AI Print Assistant. I can help you with printing services, paper types, file formats, finishing options, turnaround times, and more. How can I assist you today?",
       time: "11:56 AM",
-    },
-    {
-      role: "user",
-      message:
-        "I need business cards. Can you help me with that?",
-      time: "11:57 AM",
-    },
-    {
-      role: "ai",
-      message:
-        "Sure! For business cards, I can help you choose the right size, paper type, finish, quantity, and turnaround time. Do you want something standard and affordable, or something premium like foil, raised spot UV, or soft touch?",
-      time: "11:58 AM",
-    },
-    {
-      role: "ai",
-      message:
-        "Hello! I'm your AI Print Assistant. I can help you with printing services, paper types, file formats, finishing options, turnaround times, and more. How can I assist you today?",
-      time: "11:56 AM",
-    },
-    {
-      role: "user",
-      message:
-        "I need business cards. Can you help me with that?",
-      time: "11:57 AM",
-    },
-    {
-      role: "ai",
-      message:
-        "Sure! For business cards, I can help you choose the right size, paper type, finish, quantity, and turnaround time. Do you want something standard and affordable, or something premium like foil, raised spot UV, or soft touch?",
-      time: "11:58 AM",
+      suggestions: [
+        "I need business cards",
+        "I need flyers or brochures",
+        "I want to talk to a print specialist",
+      ],
     },
   ]);
+
+  const addDemoAiResponse = () => {
+    setTimeout(() => {
+      const aiMessage: Message = {
+        role: "ai",
+        message:
+          "Great question. I can help you choose the right print product, paper type, finish, quantity, and turnaround option based on your needs.",
+        time: getCurrentTime(),
+        suggestions: [
+          "Show me premium options",
+          "What paper do you recommend?",
+          "Talk to a print specialist",
+        ],
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    }, 800);
+  };
 
   const handleSendMessage = (message: string) => {
     const userMessage: Message = {
@@ -61,25 +54,27 @@ export default function Home() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    addDemoAiResponse();
   };
 
   const handleSuggestionClick = (question: string) => {
-  const userMessage: Message = {
-    role: "user",
-    message: question,
-    time: getCurrentTime(),
-  };
+    const userMessage: Message = {
+      role: "user",
+      message: question,
+      time: getCurrentTime(),
+    };
 
-  setMessages((prev) => [...prev, userMessage]);
-};
+    setMessages((prev) => [...prev, userMessage]);
+    addDemoAiResponse();
+  };
 
   return (
     <main className="h-screen flex flex-col bg-[#f6f7f9] overflow-hidden">
       <Header />
       <ChatArea
-  messages={messages}
-  onSuggestionClick={handleSuggestionClick}
-/>
+        messages={messages}
+        onSuggestionClick={handleSuggestionClick}
+      />
       <ChatInput onSendMessage={handleSendMessage} />
     </main>
   );
