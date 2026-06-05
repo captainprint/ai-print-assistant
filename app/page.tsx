@@ -60,13 +60,26 @@ export default function Home() {
       time: getCurrentTime(),
     };
 
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
   };
+
+  const handleSuggestionClick = (question: string) => {
+  const userMessage: Message = {
+    role: "user",
+    message: question,
+    time: getCurrentTime(),
+  };
+
+  setMessages((prev) => [...prev, userMessage]);
+};
 
   return (
     <main className="h-screen flex flex-col bg-[#f6f7f9] overflow-hidden">
       <Header />
-      <ChatArea messages={messages} />
+      <ChatArea
+  messages={messages}
+  onSuggestionClick={handleSuggestionClick}
+/>
       <ChatInput onSendMessage={handleSendMessage} />
     </main>
   );

@@ -10,11 +10,16 @@ const suggestions = [
   "Talk to a print specialist",
 ];
 
+type Props = {
+  messages: Message[];
+  onSuggestionClick: (question: string) => void;
+};
+
 export default function ChatArea({
   messages,
-}: {
-  messages: Message[];
-}) {
+  onSuggestionClick,
+}: Props) {
+
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -60,6 +65,7 @@ export default function ChatArea({
             {suggestions.map((question) => (
               <button
                 key={question}
+                onClick={() => onSuggestionClick(question)}
                 className="rounded-full bg-white border border-gray-200 px-4 py-2 text-sm text-gray-700 shadow-sm hover:border-[#3157F6] hover:text-[#3157F6] transition cursor-pointer"
               >
                 {question}
