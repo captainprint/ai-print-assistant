@@ -59,6 +59,7 @@ export default function ChatArea({
             role={message.role}
             message={message.message}
             time={message.time}
+            isTyping={message.isTyping}
           />
         ))}
 

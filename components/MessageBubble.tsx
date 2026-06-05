@@ -4,12 +4,14 @@ type Props = {
   role: "ai" | "user";
   message: string;
   time: string;
+  isTyping?: boolean;
 };
 
 export default function MessageBubble({
   role,
   message,
   time,
+  isTyping,
 }: Props) {
   if (role === "ai") {
     return (
@@ -19,11 +21,23 @@ export default function MessageBubble({
         </div>
 
         <div className="max-w-[320px] rounded-xl bg-white border border-gray-200 px-5 py-4 shadow-sm">
-          <p>{message}</p>
+          {isTyping ? (
+            <div className="flex items-center gap-1 py-1">
+              <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" />
+              <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0.15s]" />
+              <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0.3s]" />
+            </div>
+          ) : (
+            <p className="text-[16px] leading-relaxed text-gray-900">
+              {message}
+            </p>
+          )}
 
-          <p className="text-xs text-gray-500 mt-3">
-            {time}
-          </p>
+          {!isTyping && (
+            <p className="text-xs text-gray-500 mt-3">
+              {time}
+            </p>
+          )}
         </div>
       </div>
     );

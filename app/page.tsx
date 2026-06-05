@@ -29,22 +29,34 @@ export default function Home() {
   ]);
 
   const addDemoAiResponse = () => {
-    setTimeout(() => {
-      const aiMessage: Message = {
-        role: "ai",
-        message:
-          "Great question. I can help you choose the right print product, paper type, finish, quantity, and turnaround option based on your needs.",
-        time: getCurrentTime(),
-        suggestions: [
-          "Show me premium options",
-          "What paper do you recommend?",
-          "Talk to a print specialist",
-        ],
-      };
-
-      setMessages((prev) => [...prev, aiMessage]);
-    }, 800);
+  const typingMessage: Message = {
+    role: "ai",
+    message: "",
+    time: "",
+    isTyping: true,
   };
+
+  setMessages((prev) => [...prev, typingMessage]);
+
+  setTimeout(() => {
+    const aiMessage: Message = {
+      role: "ai",
+      message:
+        "Great question. I can help you choose the right print product, paper type, finish, quantity, and turnaround option based on your needs.",
+      time: getCurrentTime(),
+      suggestions: [
+        "Show me premium options",
+        "What paper do you recommend?",
+        "Talk to a print specialist",
+      ],
+    };
+
+    setMessages((prev) => [
+      ...prev.filter((message) => !message.isTyping),
+      aiMessage,
+    ]);
+  }, 1000);
+};
 
   const handleSendMessage = (message: string) => {
     const userMessage: Message = {

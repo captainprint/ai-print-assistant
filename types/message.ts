@@ -3,4 +3,5 @@ export type Message = {
   message: string;
   time: string;
   suggestions?: string[];
+  isTyping?: boolean;
 };
