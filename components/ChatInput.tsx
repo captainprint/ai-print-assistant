@@ -33,7 +33,7 @@ export default function ChatInput({ onSendMessage }: Props) {
               }
             }}
             placeholder="Not sure what to print? Ask me anything....."
-            className="flex-1 h-14 rounded-xl border-2 border-[#3157F6] px-4 text-[15px] text-gray-900 placeholder:text-gray-500 outline-none"
+            className="flex-1 h-14 rounded-xl border-2 border-[#3157F6] px-4 text-[12px] text-gray-900 placeholder:text-gray-500 outline-none"
           />
 
           <button
