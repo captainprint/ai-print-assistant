@@ -5,9 +5,10 @@ import { Send } from "lucide-react";
 
 type Props = {
   onSendMessage: (message: string) => void;
+  isAiTyping: boolean;
 };
 
-export default function ChatInput({ onSendMessage }: Props) {
+export default function ChatInput({ onSendMessage, isAiTyping }: Props) {
   const [input, setInput] = useState("");
 
   const handleSubmit = () => {
@@ -19,6 +20,8 @@ export default function ChatInput({ onSendMessage }: Props) {
     setInput("");
   };
 
+  const isDisabled = !input.trim() || isAiTyping;
+
   return (
     <footer className="bg-white border-t border-gray-200">
       <div className="max-w-[1200px] mx-auto px-8 py-4">
@@ -26,6 +29,7 @@ export default function ChatInput({ onSendMessage }: Props) {
           <input
             type="text"
             value={input}
+            disabled={isAiTyping}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
@@ -33,12 +37,16 @@ export default function ChatInput({ onSendMessage }: Props) {
               }
             }}
             placeholder="Not sure what to print? Ask me anything....."
-            className="flex-1 h-14 rounded-xl border-2 border-[#3157F6] px-4 text-[12px] text-gray-900 placeholder:text-gray-500 outline-none"
+            className="flex-1 h-14 rounded-xl border-2 border-[#3157F6] px-4 text-[16px] text-gray-900 placeholder:text-[12px] placeholder:text-gray-500 outline-none"
           />
 
           <button
             onClick={handleSubmit}
-            className="w-14 h-14 rounded-xl bg-[#3157F6] text-white flex items-center justify-center hover:bg-[#2347d8] transition cursor-pointer"
+            disabled={isDisabled}
+            className={`w-14 h-14 rounded-xl text-white flex items-center justify-center transition shrink-0 ${isDisabled
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-[#3157F6] hover:bg-[#2347d8] cursor-pointer"
+              }`}
           >
             <Send size={24} strokeWidth={2.2} />
           </button>

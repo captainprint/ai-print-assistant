@@ -67,6 +67,7 @@ function getDemoAiResponse(userMessage: string): {
 }
 
 export default function Home() {
+  const [isAiTyping, setIsAiTyping] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "ai",
@@ -82,31 +83,34 @@ export default function Home() {
   ]);
 
   const addDemoAiResponse = (userMessage: string) => {
-  const typingMessage: Message = {
-    role: "ai",
-    message: "",
-    time: "",
-    isTyping: true,
-  };
+    setIsAiTyping(true);
 
-  setMessages((prev) => [...prev, typingMessage]);
-
-  setTimeout(() => {
-    const demoResponse = getDemoAiResponse(userMessage);
-
-    const aiMessage: Message = {
+    const typingMessage: Message = {
       role: "ai",
-      message: demoResponse.message,
-      time: getCurrentTime(),
-      suggestions: demoResponse.suggestions,
+      message: "",
+      time: "",
+      isTyping: true,
     };
 
-    setMessages((prev) => [
-      ...prev.filter((message) => !message.isTyping),
-      aiMessage,
-    ]);
-  }, 1000);
-};
+    setMessages((prev) => [...prev, typingMessage]);
+
+    setTimeout(() => {
+      const demoResponse = getDemoAiResponse(userMessage);
+
+      const aiMessage: Message = {
+        role: "ai",
+        message: demoResponse.message,
+        time: getCurrentTime(),
+        suggestions: demoResponse.suggestions,
+      };
+
+      setMessages((prev) => [
+        ...prev.filter((message) => !message.isTyping),
+        aiMessage,
+      ]);
+      setIsAiTyping(false);
+    }, 1000);
+  };
 
   const handleSendMessage = (message: string) => {
     const userMessage: Message = {
@@ -137,7 +141,10 @@ export default function Home() {
         messages={messages}
         onSuggestionClick={handleSuggestionClick}
       />
-      <ChatInput onSendMessage={handleSendMessage} />
+      <ChatInput 
+      onSendMessage={handleSendMessage}
+      isAiTyping={isAiTyping} 
+      />
     </main>
   );
 }
