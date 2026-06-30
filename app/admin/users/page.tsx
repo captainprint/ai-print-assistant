@@ -39,7 +39,7 @@ export default function AdminUsersPage() {
     return (
         <AdminLayout title="Users">
             <div className="border border-gray-200 bg-white">
-                <div className="flex items-center justify-between border-b border-gray-200 px-4 py-4 md:px-6">
+                <div className="flex flex-col gap-4 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6">
                     <div>
                         <h2 className="text-lg font-semibold text-gray-900">Users</h2>
                         <p className="mt-1 text-sm text-gray-500">
@@ -52,14 +52,14 @@ export default function AdminUsersPage() {
                             setEditingUser(null);
                             setIsModalOpen(true);
                         }}
-                        className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 sm:w-auto"
                     >
                         <Plus size={16} />
                         Add User
                     </button>
                 </div>
 
-                <div className="overflow-x-auto">
+                <div className="hidden overflow-x-auto md:block">
                     <table className="w-full min-w-[650px] text-left text-sm">
                         <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
                             <tr>
@@ -115,6 +115,56 @@ export default function AdminUsersPage() {
                             ))}
                         </tbody>
                     </table>
+
+                </div>
+                <div className="divide-y divide-gray-100 md:hidden">
+                    {users.map((user) => (
+                        <div key={user.id} className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">{user.id}</p>
+                                    <h3 className="mt-1 text-sm font-semibold text-gray-900">
+                                        {user.name}
+                                    </h3>
+                                    <p className="mt-1 break-all text-sm text-gray-500">
+                                        {user.email}
+                                    </p>
+                                </div>
+
+                                <div className="relative">
+                                    <button
+                                        onClick={() =>
+                                            setOpenMenuId(openMenuId === user.id ? null : user.id)
+                                        }
+                                        className="rounded-full p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                                    >
+                                        <MoreHorizontal size={18} />
+                                    </button>
+
+                                    {openMenuId === user.id && (
+                                        <div className="absolute right-0 top-10 z-20 w-36 overflow-hidden rounded-xl border border-gray-200 bg-white p-1 text-left shadow-xl shadow-gray-200/70">
+                                            <button
+                                                onClick={() => {
+                                                    setEditingUser(user);
+                                                    setOpenMenuId(null);
+                                                    setIsModalOpen(true);
+                                                }}
+                                                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                            >
+                                                Edit user
+                                            </button>
+
+                                            <button
+                                                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                                            >
+                                                Delete user
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 
