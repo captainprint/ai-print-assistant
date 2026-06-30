@@ -1,3 +1,6 @@
+import { mockMessages } from "@/data/mockMessages";
+import MessageBubble from "./MessageBubble"
+
 export default function ConversationMessages() {
   return (
     <div className="flex-1 overflow-y-auto bg-[#f6f7f9] px-4 py-6 md:px-6">
@@ -7,10 +10,15 @@ export default function ConversationMessages() {
         <div className="h-px flex-1 bg-gray-200" />
       </div>
 
-      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-6 text-center">
-        <p className="text-sm text-gray-500">
-          Messages will be displayed here.
-        </p>
+      <div className="space-y-6">
+        {mockMessages.map((message) => (
+          <MessageBubble
+            key={message.id}
+            sender={message.sender as "customer" | "assistant"}
+            message={message.message}
+            time={message.time}
+          />
+        ))}
       </div>
     </div>
   );
