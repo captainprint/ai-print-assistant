@@ -2,10 +2,10 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 
 export default function AdminSettingsPage() {
   return (
-    <main className="min-h-screen bg-[#f6f7f9] pl-64">
+    <main className="min-h-screen bg-[#f6f7f9] pt-[116px] md:pl-64 md:pt-0">
       <AdminSidebar />
 
-      <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+      <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6">
         <h1 className="text-lg font-semibold text-gray-900">
           Settings
         </h1>
