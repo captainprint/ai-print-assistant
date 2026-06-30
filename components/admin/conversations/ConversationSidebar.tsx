@@ -1,5 +1,6 @@
 import ConversationSearch from "./ConversationSearch";
 import StatusFilter from "./StatusFilter";
+import ConversationCard from "./ConversationCard";
 
 export default function ConversationSidebar() {
     return (
@@ -21,10 +22,8 @@ export default function ConversationSidebar() {
                 <StatusFilter />
             </div>
 
-            <div className="p-4">
-                <p className="text-sm text-gray-500">
-                    Conversation list will be added here.
-                </p>
+            <div>
+                <ConversationCard active />
             </div>
         </aside>
     );
