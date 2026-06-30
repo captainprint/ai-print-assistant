@@ -29,6 +29,11 @@ const users = [
 
 export default function AdminUsersPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState<{
+        id: string;
+        name: string;
+        email: string;
+    } | null>(null);
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
     return (
@@ -43,7 +48,10 @@ export default function AdminUsersPage() {
                     </div>
 
                     <button
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => {
+                            setEditingUser(null);
+                            setIsModalOpen(true);
+                        }}
                         className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                     >
                         <Plus size={16} />
@@ -86,7 +94,14 @@ export default function AdminUsersPage() {
 
                                         {openMenuId === user.id && (
                                             <div className="absolute right-6 top-12 z-20 w-36 overflow-hidden rounded-xl border border-gray-200 bg-white p-1 text-left shadow-xl shadow-gray-200/70">
-                                                <button className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingUser(user);
+                                                        setOpenMenuId(null);
+                                                        setIsModalOpen(true);
+                                                    }}
+                                                    className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                                >
                                                     Edit user
                                                 </button>
 
@@ -108,7 +123,7 @@ export default function AdminUsersPage() {
                     <div className="w-full max-w-md bg-white shadow-xl">
                         <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
                             <h3 className="text-lg font-semibold text-gray-900">
-                                Add User
+                                {editingUser ? "Edit User" : "Add User"}
                             </h3>
 
                             <button
@@ -126,6 +141,7 @@ export default function AdminUsersPage() {
                                 </label>
                                 <input
                                     type="text"
+                                    defaultValue={editingUser?.name ?? ""}
                                     placeholder="Enter full name"
                                     className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                                 />
@@ -137,6 +153,7 @@ export default function AdminUsersPage() {
                                 </label>
                                 <input
                                     type="email"
+                                    defaultValue={editingUser?.email ?? ""}
                                     placeholder="Enter email address"
                                     className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                                 />
@@ -144,11 +161,15 @@ export default function AdminUsersPage() {
 
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Password
+                                    {editingUser ? "New Password" : "Password"}
                                 </label>
                                 <input
                                     type="password"
-                                    placeholder="Create password"
+                                    placeholder={
+                                        editingUser
+                                            ? "Leave blank to keep current password"
+                                            : "Create password"
+                                    }
                                     className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                                 />
                             </div>
@@ -166,7 +187,7 @@ export default function AdminUsersPage() {
                                     type="submit"
                                     className="bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                                 >
-                                    Add User
+                                    {editingUser ? "Save Changes" : "Add User"}
                                 </button>
                             </div>
                         </form>
