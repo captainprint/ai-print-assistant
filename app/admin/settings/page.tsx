@@ -1,0 +1,31 @@
+import AdminSidebar from "@/components/admin/AdminSidebar";
+
+export default function AdminSettingsPage() {
+  return (
+    <main className="min-h-screen bg-[#f6f7f9] pl-64">
+      <AdminSidebar />
+
+      <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+        <h1 className="text-lg font-semibold text-gray-900">
+          Settings
+        </h1>
+
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600">
+          AC
+        </div>
+      </header>
+
+      <section className="p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Settings
+          </h2>
+
+          <p className="mt-2 text-sm text-gray-500">
+            Settings page coming soon.
+          </p>
+        </div>
+      </section>
+    </main>
+  );
+}
