@@ -1,6 +1,54 @@
-import { Eye, Mail, Printer } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Mail, Printer, Loader2 } from "lucide-react";
+import { saveAuth } from "@/lib/adminAuth";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 
 export default function LoginForm() {
+  const router = useRouter();
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const isEmail = identifier.includes("@");
+      const endpoint = isEmail ? "/api/auth/login" : "/api/admin/login";
+      const body = isEmail
+        ? { email: identifier, password }
+        : { username: identifier, password };
+
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Login failed. Please check your credentials.");
+        return;
+      }
+
+      saveAuth(data.token, data.user);
+      router.push("/admin/dashboard");
+    } catch {
+      setError("Unable to connect to server. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div>
       <div className="mb-8 flex items-center justify-center gap-3">
@@ -22,18 +70,28 @@ export default function LoginForm() {
           Sign in to your support dashboard
         </p>
 
-        <form className="mt-8 space-y-5">
+        {error && (
+          <div className="mt-5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <div>
             <label className="mb-2 block text-sm font-semibold text-[#111827]">
-              Email address
+              Username or Email
             </label>
 
-            <div className="flex h-12 items-center gap-3 rounded-2xl border border-[#d9dde5] bg-[#fbfcfd] px-4">
-              <Mail size={18} className="text-[#6b7280]" />
+            <div className="flex h-12 items-center gap-3 rounded-2xl border border-[#d9dde5] bg-[#fbfcfd] px-4 transition-colors focus-within:border-[#4361ee]">
+              <Mail size={18} className="shrink-0 text-[#6b7280]" />
               <input
-                type="email"
-                defaultValue="example@aiprintassistant.com"
-                className="w-full bg-transparent text-sm text-[#111827] outline-none"
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="admin or you@example.com"
+                required
+                autoComplete="username"
+                className="w-full bg-transparent text-sm text-[#111827] outline-none placeholder:text-[#9ca3af]"
               />
             </div>
           </div>
@@ -52,31 +110,34 @@ export default function LoginForm() {
               </button>
             </div>
 
-            <div className="flex h-12 items-center gap-3 rounded-2xl border border-[#d9dde5] bg-[#fbfcfd] px-4">
+            <div className="flex h-12 items-center gap-3 rounded-2xl border border-[#d9dde5] bg-[#fbfcfd] px-4 transition-colors focus-within:border-[#4361ee]">
               <input
-                type="password"
-                defaultValue="password123"
-                className="w-full bg-transparent text-sm text-[#111827] outline-none"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+                autoComplete="current-password"
+                className="w-full bg-transparent text-sm text-[#111827] outline-none placeholder:text-[#9ca3af]"
               />
 
-              <Eye size={18} className="text-[#6b7280]" />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="shrink-0 text-[#6b7280] transition-colors hover:text-[#111827]"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-[#6b7280]">
-            <input
-              type="checkbox"
-              defaultChecked
-              className="h-4 w-4 accent-[#4361ee]"
-            />
-            Keep me signed in
-          </label>
-
           <button
             type="submit"
-            className="h-12 w-full rounded-2xl bg-[#4361ee] text-sm font-semibold text-white shadow-sm transition hover:bg-[#304ee0]"
+            disabled={loading}
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#4361ee] text-sm font-semibold text-white shadow-sm transition hover:bg-[#304ee0] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Sign in
+            {loading && <Loader2 size={16} className="animate-spin" />}
+            {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
       </div>
