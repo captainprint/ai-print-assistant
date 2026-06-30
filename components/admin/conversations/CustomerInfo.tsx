@@ -36,6 +36,26 @@ export default function CustomerInfo() {
           <InfoRow icon={MessageSquare} label="Total Conversations" value="7" />
         </div>
 
+        <div className="mt-6 rounded-xl border border-gray-200 bg-white p-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+                Issue Status
+              </p>
+              <p className="mt-1 text-[13px] text-gray-600">
+                Mark this conversation as resolved.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-300 transition"
+            >
+              <span className="inline-block h-5 w-5 translate-x-0.5 rounded-full bg-white shadow transition" />
+            </button>
+          </div>
+        </div>
+
         <div className="mt-6 rounded-xl bg-gray-100 p-3">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">
             Assigned To
