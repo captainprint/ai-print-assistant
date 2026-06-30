@@ -31,7 +31,7 @@ export const mockConversations = [
     name: "David Lee",
     initials: "DL",
     time: "3h",
-    status: "Open",
+    status: "Waiting",
     message:
       "Do you offer same-day printing for foam board signs?",
   },
