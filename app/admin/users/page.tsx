@@ -93,7 +93,7 @@ export default function AdminUsersPage() {
                                         </button>
 
                                         {openMenuId === user.id && (
-                                            <div className="absolute right-6 top-12 z-20 w-36 overflow-hidden rounded-xl border border-gray-200 bg-white p-1 text-left shadow-xl shadow-gray-200/70">
+                                            <div className="absolute right-16 top-1/2 z-20 w-36 -translate-y-1/2 overflow-hidden rounded-xl border border-gray-200 bg-white p-1 text-left shadow-xl shadow-gray-200/70">
                                                 <button
                                                     onClick={() => {
                                                         setEditingUser(user);
@@ -142,7 +142,7 @@ export default function AdminUsersPage() {
                                     </button>
 
                                     {openMenuId === user.id && (
-                                        <div className="absolute right-0 top-10 z-20 w-36 overflow-hidden rounded-xl border border-gray-200 bg-white p-1 text-left shadow-xl shadow-gray-200/70">
+                                        <div className="absolute right-10 top-0 z-20 w-36 overflow-hidden rounded-xl border border-gray-200 bg-white p-1 text-left shadow-xl">
                                             <button
                                                 onClick={() => {
                                                     setEditingUser(user);
