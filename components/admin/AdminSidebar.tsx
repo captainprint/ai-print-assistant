@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, MessageSquare, Settings, Printer } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Settings, Printer, Users } from "lucide-react";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -10,6 +10,7 @@ export default function AdminSidebar() {
   const navItems = [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/conversations", label: "Conversations", icon: MessageSquare },
+    { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
