@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   BriefcaseBusiness,
   Calendar,
@@ -7,6 +10,7 @@ import {
 } from "lucide-react";
 
 export default function CustomerInfo() {
+  const [isResolved, setIsResolved] = useState(false);
   return (
     <aside className="h-full bg-white">
       <div className="border-b border-gray-200 px-5 py-4">
@@ -36,6 +40,7 @@ export default function CustomerInfo() {
           <InfoRow icon={MessageSquare} label="Total Conversations" value="7" />
         </div>
 
+        {/* MARK RESOLVED TOGGLE BUTTON */}
         <div className="mt-6 rounded-xl border border-gray-200 bg-white p-3">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -43,15 +48,22 @@ export default function CustomerInfo() {
                 Issue Status
               </p>
               <p className="mt-1 text-[13px] text-gray-600">
-                Mark this conversation as resolved.
+                {isResolved
+                  ? "Marked as resolved."
+                  : "Conversation is still active."}
               </p>
             </div>
 
             <button
               type="button"
-              className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-300 transition"
+              onClick={() => setIsResolved(!isResolved)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${isResolved ? "bg-green-500" : "bg-gray-300"
+                }`}
             >
-              <span className="inline-block h-5 w-5 translate-x-0.5 rounded-full bg-white shadow transition" />
+              <span
+                className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${isResolved ? "translate-x-5" : "translate-x-0.5"
+                  }`}
+              />
             </button>
           </div>
         </div>
