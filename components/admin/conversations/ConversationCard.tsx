@@ -1,3 +1,5 @@
+import StatusBadge from "./StatusBadge";
+
 type ConversationCardProps = {
     name: string;
     initials: string;
@@ -47,11 +49,7 @@ export default function ConversationCard({
                     <p className="mt-1 line-clamp-2 text-sm text-gray-500">{message}</p>
 
                     <div className="mt-3">
-                        <span
-                            className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${badgeClass}`}
-                        >
-                            {status}
-                        </span>
+                        <StatusBadge status={status as any} />
                     </div>
                 </div>
             </div>
