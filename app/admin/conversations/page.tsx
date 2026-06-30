@@ -4,6 +4,7 @@ import ConversationHeader from "@/components/admin/conversations/ConversationHea
 import ConversationMessages from "@/components/admin/conversations/ConversationMessages";
 import ReplyComposer from "@/components/admin/conversations/ReplyComposer";
 import CustomerInfo from "@/components/admin/conversations/CustomerInfo";
+import ConversationPanel from "@/components/admin/conversations/ConversationPanel";
 
 export default function AdminConversationsPage() {
     return (
@@ -12,11 +13,7 @@ export default function AdminConversationsPage() {
                 <ConversationSidebar />
 
 
-                <section className="flex flex-col border-l border-gray-200 bg-white">
-                    <ConversationHeader />
-                    <ConversationMessages />
-                    <ReplyComposer />
-                </section>
+                <ConversationPanel />
 
                 <aside className="hidden xl:block w-[280px] shrink-0 border-l border-gray-200 bg-white">
                     <CustomerInfo />
