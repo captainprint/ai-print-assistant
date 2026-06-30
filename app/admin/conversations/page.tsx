@@ -3,6 +3,7 @@ import ConversationSidebar from "@/components/admin/conversations/ConversationSi
 import ConversationHeader from "@/components/admin/conversations/ConversationHeader";
 import ConversationMessages from "@/components/admin/conversations/ConversationMessages";
 import ReplyComposer from "@/components/admin/conversations/ReplyComposer";
+import CustomerInfo from "@/components/admin/conversations/CustomerInfo";
 
 export default function AdminConversationsPage() {
     return (
@@ -17,13 +18,8 @@ export default function AdminConversationsPage() {
                     <ReplyComposer />
                 </section>
 
-                <aside className="border-l border-gray-200 p-4 md:p-6">
-                    <h2 className="text-lg font-semibold text-gray-900">
-                        Customer Info
-                    </h2>
-                    <p className="mt-2 text-sm text-gray-500">
-                        Customer details will be added here.
-                    </p>
+                <aside className="border-l border-gray-200 bg-white">
+                    <CustomerInfo />
                 </aside>
             </div>
         </AdminLayout>
