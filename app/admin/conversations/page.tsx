@@ -1,6 +1,7 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import ConversationSidebar from "@/components/admin/conversations/ConversationSidebar";
 import ConversationHeader from "@/components/admin/conversations/ConversationHeader";
+import ConversationMessages from "@/components/admin/conversations/ConversationMessages";
 
 export default function AdminConversationsPage() {
     return (
@@ -11,11 +12,7 @@ export default function AdminConversationsPage() {
                 <section className="flex flex-col border-l border-gray-200 bg-white">
                     <ConversationHeader />
 
-                    <div className="flex-1 p-6">
-                        <p className="text-sm text-gray-500">
-                            Messages will be displayed here.
-                        </p>
-                    </div>
+                    <ConversationMessages />
                 </section>
 
                 <aside className="border-l border-gray-200 p-4 md:p-6">
