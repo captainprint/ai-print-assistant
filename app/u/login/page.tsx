@@ -1,6 +1,6 @@
 import LoginForm from "@/components/admin/LoginForm";
 
-export default function AdminLoginPage() {
+export default function LoginPage() {
   return (
     <main className="min-h-screen bg-[#f5f6f8] flex items-center justify-center px-4">
       <div className="w-full max-w-[420px]">
