@@ -9,9 +9,10 @@ import type { AdminUser } from "@/lib/adminAuth";
 type AdminLayoutProps = {
   title: string;
   children: React.ReactNode;
+  adminOnly?: boolean;
 };
 
-export default function AdminLayout({ title, children }: AdminLayoutProps) {
+export default function AdminLayout({ title, children, adminOnly }: AdminLayoutProps) {
   const router = useRouter();
   const [user, setUser] = useState<AdminUser | null>(null);
 
@@ -21,8 +22,12 @@ export default function AdminLayout({ title, children }: AdminLayoutProps) {
       router.replace("/admin/login");
       return;
     }
+    if (adminOnly && u.role !== "admin") {
+      router.replace("/admin/conversations");
+      return;
+    }
     setUser(u);
-  }, [router]);
+  }, [router, adminOnly]);
 
   function handleLogout() {
     clearAuth();
@@ -31,7 +36,7 @@ export default function AdminLayout({ title, children }: AdminLayoutProps) {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f6f7f9] pt-[132px] md:pl-64 md:pt-0">
-      <AdminSidebar onLogout={handleLogout} />
+      <AdminSidebar onLogout={handleLogout} role={user?.role} />
 
       <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6">
         <h1 className="text-lg font-semibold text-gray-900">{title}</h1>

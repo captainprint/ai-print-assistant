@@ -14,17 +14,24 @@ import {
 
 type AdminSidebarProps = {
   onLogout: () => void;
+  role?: string;
 };
 
-export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
+const ADMIN_NAV_ITEMS = [
+  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/conversations", label: "Conversations", icon: MessageSquare },
+  { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
+];
+
+const USER_NAV_ITEMS = [
+  { href: "/admin/conversations", label: "Conversations", icon: MessageSquare },
+];
+
+export default function AdminSidebar({ onLogout, role }: AdminSidebarProps) {
   const pathname = usePathname();
 
-  const navItems = [
-    { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/conversations", label: "Conversations", icon: MessageSquare },
-    { href: "/admin/users", label: "Users", icon: Users },
-    { href: "/admin/settings", label: "Settings", icon: Settings },
-  ];
+  const navItems = role === "admin" ? ADMIN_NAV_ITEMS : USER_NAV_ITEMS;
 
   return (
     <aside className="fixed left-0 top-0 z-40 w-full border-b border-gray-200 bg-white md:h-screen md:w-64 md:border-b-0 md:border-r">
