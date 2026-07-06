@@ -4,6 +4,7 @@ const PROTECTED_PATHS = [
   "/admin/dashboard",
   "/admin/conversations",
   "/admin/settings",
+  "/admin/users",
 ];
 
 export function proxy(request: NextRequest) {
