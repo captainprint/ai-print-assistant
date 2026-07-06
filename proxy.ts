@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PROTECTED_PATHS = [
+const ADMIN_PATHS = [
   "/admin/dashboard",
   "/admin/conversations",
   "/admin/settings",
   "/admin/users",
 ];
 
-const ADMIN_ONLY_PATHS = ["/admin/dashboard", "/admin/settings", "/admin/users"];
+const USER_PATHS = ["/user/conversations"];
+
+const LOGIN_PATH = "/u/login";
 
 function getRole(token: string): string | null {
   try {
@@ -24,21 +26,25 @@ export function proxy(request: NextRequest) {
   const hasToken = !!token;
   const role = token ? getRole(token) : null;
 
-  const isProtected = PROTECTED_PATHS.some((p) => pathname.startsWith(p));
-  const isAdminOnly = ADMIN_ONLY_PATHS.some((p) => pathname.startsWith(p));
-  const isLoginPage = pathname === "/admin/login";
+  const isAdminArea = ADMIN_PATHS.some((p) => pathname.startsWith(p));
+  const isUserArea = USER_PATHS.some((p) => pathname.startsWith(p));
+  const isLoginPage = pathname === LOGIN_PATH;
 
-  if (isProtected && !hasToken) {
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+  if ((isAdminArea || isUserArea) && !hasToken) {
+    return NextResponse.redirect(new URL(LOGIN_PATH, request.url));
   }
 
-  if (isAdminOnly && hasToken && role !== "admin") {
-    return NextResponse.redirect(new URL("/admin/conversations", request.url));
+  if (isAdminArea && role !== "admin") {
+    return NextResponse.redirect(new URL("/user/conversations", request.url));
+  }
+
+  if (isUserArea && role === "admin") {
+    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
 
   if (isLoginPage && hasToken) {
     return NextResponse.redirect(
-      new URL(role === "admin" ? "/admin/dashboard" : "/admin/conversations", request.url)
+      new URL(role === "admin" ? "/admin/dashboard" : "/user/conversations", request.url)
     );
   }
 
@@ -46,5 +52,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/user/:path*", "/u/:path*"],
 };

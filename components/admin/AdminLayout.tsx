@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { getUser, clearAuth, getInitials } from "@/lib/adminAuth";
 import type { AdminUser } from "@/lib/adminAuth";
@@ -9,29 +9,33 @@ import type { AdminUser } from "@/lib/adminAuth";
 type AdminLayoutProps = {
   title: string;
   children: React.ReactNode;
-  adminOnly?: boolean;
 };
 
-export default function AdminLayout({ title, children, adminOnly }: AdminLayoutProps) {
+export default function AdminLayout({ title, children }: AdminLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState<AdminUser | null>(null);
 
   useEffect(() => {
     const u = getUser();
     if (!u) {
-      router.replace("/admin/login");
+      router.replace("/u/login");
       return;
     }
-    if (adminOnly && u.role !== "admin") {
-      router.replace("/admin/conversations");
+    if (pathname.startsWith("/admin") && u.role !== "admin") {
+      router.replace("/user/conversations");
+      return;
+    }
+    if (pathname.startsWith("/user") && u.role === "admin") {
+      router.replace("/admin/dashboard");
       return;
     }
     setUser(u);
-  }, [router, adminOnly]);
+  }, [router, pathname]);
 
   function handleLogout() {
     clearAuth();
-    router.push("/admin/login");
+    router.push("/u/login");
   }
 
   return (

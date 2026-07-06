@@ -25,7 +25,7 @@ const ADMIN_NAV_ITEMS = [
 ];
 
 const USER_NAV_ITEMS = [
-  { href: "/admin/conversations", label: "Conversations", icon: MessageSquare },
+  { href: "/user/conversations", label: "Conversations", icon: MessageSquare },
 ];
 
 export default function AdminSidebar({ onLogout, role }: AdminSidebarProps) {

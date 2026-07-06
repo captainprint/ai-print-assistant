@@ -16,7 +16,7 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
 
   if (res.status === 401 && typeof window !== "undefined") {
     clearAuth();
-    window.location.href = "/admin/login";
+    window.location.href = "/u/login";
   }
 
   return res;

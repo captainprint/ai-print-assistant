@@ -41,7 +41,7 @@ export default function LoginForm() {
       }
 
       saveAuth(data.token, data.user);
-      router.push(data.user.role === "admin" ? "/admin/dashboard" : "/admin/conversations");
+      router.push(data.user.role === "admin" ? "/admin/dashboard" : "/user/conversations");
     } catch {
       setError("Unable to connect to server. Please try again.");
     } finally {

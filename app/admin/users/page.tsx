@@ -154,7 +154,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <AdminLayout title="Users" adminOnly>
+    <AdminLayout title="Users">
       <div className="border border-gray-200 bg-white">
         <div className="flex flex-col gap-4 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6">
           <div>
