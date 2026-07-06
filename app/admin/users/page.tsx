@@ -4,13 +4,12 @@ import { useEffect, useState } from "react";
 import { Plus, MoreHorizontal, X, Loader2 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { apiFetch } from "@/lib/api";
-import type { User, UserRole } from "@/types/user";
+import type { User } from "@/types/user";
 
 type UserFormState = {
   fullName: string;
   email: string;
   phone: string;
-  role: UserRole;
   password: string;
 };
 
@@ -18,7 +17,6 @@ const emptyForm: UserFormState = {
   fullName: "",
   email: "",
   phone: "",
-  role: "staff",
   password: "",
 };
 
@@ -89,7 +87,6 @@ export default function AdminUsersPage() {
       fullName: user.fullName,
       email: user.email,
       phone: user.phone,
-      role: user.role,
       password: "",
     });
     setFormError("");
@@ -108,7 +105,6 @@ export default function AdminUsersPage() {
         fullName: form.fullName,
         email: form.email,
         phone: form.phone,
-        role: form.role,
       };
       if (form.password || !isEdit) body.password = form.password;
 
@@ -158,7 +154,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <AdminLayout title="Users">
+    <AdminLayout title="Users" adminOnly>
       <div className="border border-gray-200 bg-white">
         <div className="flex flex-col gap-4 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6">
           <div>
@@ -205,13 +201,12 @@ export default function AdminUsersPage() {
         ) : (
           <>
             <div className="hidden overflow-x-auto md:block">
-              <table className="w-full min-w-[750px] text-left text-sm">
+              <table className="w-full min-w-[650px] text-left text-sm">
                 <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
                   <tr>
                     <th className="px-4 py-3 md:px-6">Name</th>
                     <th className="px-4 py-3 md:px-6">Email</th>
                     <th className="px-4 py-3 md:px-6">Phone</th>
-                    <th className="px-4 py-3 md:px-6">Role</th>
                     <th className="px-4 py-3 md:px-6">Status</th>
                     <th className="px-4 py-3 text-right md:px-6">Action</th>
                   </tr>
@@ -228,9 +223,6 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="px-4 py-4 text-gray-700 md:px-6">
                         {user.phone}
-                      </td>
-                      <td className="px-4 py-4 capitalize text-gray-700 md:px-6">
-                        {user.role}
                       </td>
                       <td className="px-4 py-4 md:px-6">
                         <span
@@ -295,9 +287,6 @@ export default function AdminUsersPage() {
                       </p>
                       <p className="mt-1 text-sm text-gray-500">{user.phone}</p>
                       <div className="mt-2 flex items-center gap-2">
-                        <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium capitalize text-gray-600">
-                          {user.role}
-                        </span>
                         <span
                           className={`rounded-full px-2 py-1 text-xs font-medium ${
                             user.isActive
@@ -431,23 +420,6 @@ export default function AdminUsersPage() {
                   required
                   className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
-                  Role
-                </label>
-                <select
-                  value={form.role}
-                  onChange={(e) =>
-                    setForm({ ...form, role: e.target.value as UserRole })
-                  }
-                  className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                >
-                  <option value="staff">Staff</option>
-                  <option value="manager">Manager</option>
-                  <option value="viewer">Viewer</option>
-                </select>
               </div>
 
               <div>
