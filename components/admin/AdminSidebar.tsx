@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import {
   LayoutDashboard,
   MessageSquare,
   Settings,
   Printer,
+  Users,
   LogOut,
 } from "lucide-react";
 
@@ -20,6 +22,7 @@ export default function AdminSidebar({ onLogout }: AdminSidebarProps) {
   const navItems = [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/conversations", label: "Conversations", icon: MessageSquare },
+    { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
 

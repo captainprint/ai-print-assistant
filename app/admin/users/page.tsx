@@ -1,0 +1,249 @@
+"use client";
+
+import { useState } from "react";
+import { Plus, MoreHorizontal, X } from "lucide-react";
+import AdminLayout from "@/components/admin/AdminLayout";
+
+const users = [
+    {
+        id: "USR-001",
+        name: "Sakchhi Gurung",
+        email: "sakchhi.gurung@captainprint.com",
+    },
+    {
+        id: "USR-002",
+        name: "Nisha Bhattarai",
+        email: "webmaster@captainprint.com",
+    },
+    {
+        id: "USR-003",
+        name: "Vickie Chen",
+        email: "vickie@captainprint.com",
+    },
+    {
+        id: "USR-004",
+        name: "Lyndsay Nash",
+        email: "lyndsay@captainprint.com",
+    },
+];
+
+export default function AdminUsersPage() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState<{
+        id: string;
+        name: string;
+        email: string;
+    } | null>(null);
+    const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+    return (
+        <AdminLayout title="Users">
+            <div className="border border-gray-200 bg-white">
+                <div className="flex flex-col gap-4 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6">
+                    <div>
+                        <h2 className="text-lg font-semibold text-gray-900">Users</h2>
+                        <p className="mt-1 text-sm text-gray-500">
+                            Manage admin users and access.
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={() => {
+                            setEditingUser(null);
+                            setIsModalOpen(true);
+                        }}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 sm:w-auto"
+                    >
+                        <Plus size={16} />
+                        Add User
+                    </button>
+                </div>
+
+                <div className="hidden overflow-x-auto md:block">
+                    <table className="w-full min-w-[650px] text-left text-sm">
+                        <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
+                            <tr>
+                                <th className="px-4 py-3 md:px-6">ID</th>
+                                <th className="px-4 py-3 md:px-6">Name</th>
+                                <th className="px-4 py-3 md:px-6">Email</th>
+                                <th className="px-4 py-3 text-right md:px-6">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody className="divide-y divide-gray-100">
+                            {users.map((user) => (
+                                <tr key={user.id} className="hover:bg-gray-50">
+                                    <td className="px-4 py-4 font-medium text-gray-900 md:px-6">
+                                        {user.id}
+                                    </td>
+                                    <td className="px-4 py-4 text-gray-700 md:px-6">
+                                        {user.name}
+                                    </td>
+                                    <td className="px-4 py-4 text-gray-700 md:px-6">
+                                        {user.email}
+                                    </td>
+                                    <td className="relative px-4 py-4 text-right md:px-6">
+                                        <button
+                                            onClick={() =>
+                                                setOpenMenuId(openMenuId === user.id ? null : user.id)
+                                            }
+                                            className="rounded-full p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                                        >
+                                            <MoreHorizontal size={18} />
+                                        </button>
+
+                                        {openMenuId === user.id && (
+                                            <div className="absolute right-16 top-1/2 z-20 w-36 -translate-y-1/2 overflow-hidden rounded-xl border border-gray-200 bg-white p-1 text-left shadow-xl shadow-gray-200/70">
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingUser(user);
+                                                        setOpenMenuId(null);
+                                                        setIsModalOpen(true);
+                                                    }}
+                                                    className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                                >
+                                                    Edit user
+                                                </button>
+
+                                                <button className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50">
+                                                    Delete user
+                                                </button>
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                </div>
+                <div className="divide-y divide-gray-100 md:hidden">
+                    {users.map((user) => (
+                        <div key={user.id} className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">{user.id}</p>
+                                    <h3 className="mt-1 text-sm font-semibold text-gray-900">
+                                        {user.name}
+                                    </h3>
+                                    <p className="mt-1 break-all text-sm text-gray-500">
+                                        {user.email}
+                                    </p>
+                                </div>
+
+                                <div className="relative">
+                                    <button
+                                        onClick={() =>
+                                            setOpenMenuId(openMenuId === user.id ? null : user.id)
+                                        }
+                                        className="rounded-full p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                                    >
+                                        <MoreHorizontal size={18} />
+                                    </button>
+
+                                    {openMenuId === user.id && (
+                                        <div className="absolute right-10 top-0 z-20 w-36 overflow-hidden rounded-xl border border-gray-200 bg-white p-1 text-left shadow-xl">
+                                            <button
+                                                onClick={() => {
+                                                    setEditingUser(user);
+                                                    setOpenMenuId(null);
+                                                    setIsModalOpen(true);
+                                                }}
+                                                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                            >
+                                                Edit user
+                                            </button>
+
+                                            <button
+                                                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                                            >
+                                                Delete user
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                    <div className="w-full max-w-md bg-white shadow-xl">
+                        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                {editingUser ? "Edit User" : "Add User"}
+                            </h3>
+
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="rounded-lg p-1 text-gray-500 hover:bg-gray-100"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <form className="space-y-4 px-5 py-5">
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Name
+                                </label>
+                                <input
+                                    type="text"
+                                    defaultValue={editingUser?.name ?? ""}
+                                    placeholder="Enter full name"
+                                    className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    defaultValue={editingUser?.email ?? ""}
+                                    placeholder="Enter email address"
+                                    className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    {editingUser ? "New Password" : "Password"}
+                                </label>
+                                <input
+                                    type="password"
+                                    placeholder={
+                                        editingUser
+                                            ? "Leave blank to keep current password"
+                                            : "Create password"
+                                    }
+                                    className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    className="bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                                >
+                                    {editingUser ? "Save Changes" : "Add User"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </AdminLayout>
+    );
+}
