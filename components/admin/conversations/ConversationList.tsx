@@ -13,16 +13,17 @@ export default function ConversationList({
   return (
     <div>
       {mockConversations.map((conversation) => (
-        <div
+        <button
           key={conversation.id}
+          type="button"
           onClick={() => onSelectConversation?.(conversation.id)}
-          className="cursor-pointer"
+          className="block w-full text-left"
         >
           <ConversationCard
             {...conversation}
             active={conversation.id === selectedConversationId}
           />
-        </div>
+        </button>
       ))}
     </div>
   );

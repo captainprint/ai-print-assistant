@@ -6,22 +6,34 @@ import ConversationHeader from "./ConversationHeader";
 import ConversationMessages from "./ConversationMessages";
 import ReplyComposer from "./ReplyComposer";
 import CustomerInfo from "./CustomerInfo";
+import { mockMessages } from "@/data/mockMessages";
+import { mockMarcusMessages } from "@/data/mockMarcusMessages";
 
 type ConversationPanelProps = {
+  selectedConversationId?: string | null;
   onBack?: () => void;
   showBackButton?: boolean;
 };
 
 export default function ConversationPanel({
+  selectedConversationId,
   onBack,
   showBackButton = false,
 }: ConversationPanelProps) {
   const [isCustomerInfoOpen, setIsCustomerInfoOpen] = useState(false);
+  const messages =
+    selectedConversationId === "1"
+      ? mockMessages
+      : selectedConversationId === "2"
+        ? mockMarcusMessages
+        : [];
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
   }, []);
+
 
   return (
     <>
@@ -33,7 +45,13 @@ export default function ConversationPanel({
         />
 
         <div className="min-h-0 flex-1 overflow-y-auto bg-[#f6f7f9]">
-          <ConversationMessages />
+          {messages.length === 0 ? (
+            <div className="flex h-full items-center justify-center text-gray-500">
+              Conversation not available yet.
+            </div>
+          ) : (
+            <ConversationMessages messages={messages} />
+          )}
           <div ref={messagesEndRef} />
         </div>
 

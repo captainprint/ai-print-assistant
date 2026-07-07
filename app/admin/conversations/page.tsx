@@ -20,6 +20,7 @@ export default function AdminConversationsPage() {
           }`}
         >
           <ConversationSidebar
+          selectedConversationId={selectedConversationId}
             onSelectConversation={(id) => setSelectedConversationId(id)}
           />
         </div>
@@ -31,6 +32,7 @@ export default function AdminConversationsPage() {
           }`}
         >
           <ConversationPanel
+          selectedConversationId={selectedConversationId}
             onBack={() => setSelectedConversationId(null)}
             showBackButton={!!selectedConversationId}
           />

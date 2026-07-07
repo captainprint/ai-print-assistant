@@ -1,4 +1,13 @@
-export const mockMessages = [
+export type Message = {
+  id: string;
+  sender: "customer" | "ai" | "admin";
+  senderName: string;
+  initials: string;
+  message: string;
+  time: string;
+};
+
+export const mockMessages: Message[] = [
   {
     id: "1",
     sender: "customer",
