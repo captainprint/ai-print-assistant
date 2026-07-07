@@ -7,7 +7,15 @@ import ConversationMessages from "./ConversationMessages";
 import ReplyComposer from "./ReplyComposer";
 import CustomerInfo from "./CustomerInfo";
 
-export default function ConversationPanel() {
+type ConversationPanelProps = {
+  onBack?: () => void;
+  showBackButton?: boolean;
+};
+
+export default function ConversationPanel({
+  onBack,
+  showBackButton = false,
+}: ConversationPanelProps) {
   const [isCustomerInfoOpen, setIsCustomerInfoOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -19,12 +27,16 @@ export default function ConversationPanel() {
     <>
       <section className="flex h-full min-h-0 flex-col border-l border-gray-200 bg-white">
         <ConversationHeader
+          onBack={onBack}
+          showBackButton={showBackButton}
           onToggleCustomerInfo={() => setIsCustomerInfoOpen(true)}
         />
+
         <div className="min-h-0 flex-1 overflow-y-auto bg-[#f6f7f9]">
           <ConversationMessages />
           <div ref={messagesEndRef} />
         </div>
+
         <div className="shrink-0">
           <ReplyComposer />
         </div>

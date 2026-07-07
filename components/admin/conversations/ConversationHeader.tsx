@@ -1,17 +1,31 @@
 "use client";
 
-import { ChevronDown, Info } from "lucide-react";
+import { ArrowLeft, ChevronDown, Info } from "lucide-react";
 
 type ConversationHeaderProps = {
-    onToggleCustomerInfo?: () => void;
+    onBack?: () => void;
+    showBackButton?: boolean;
+    onToggleCustomerInfo: () => void;
 };
 
 export default function ConversationHeader({
+    onBack,
+    showBackButton,
     onToggleCustomerInfo,
 }: ConversationHeaderProps) {
     return (
         <header className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
             <div className="flex items-center gap-3">
+                {showBackButton && (
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        className="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100 xl:hidden"
+                        aria-label="Back to conversations"
+                    >
+                        <ArrowLeft size={20} />
+                    </button>
+                )}
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
                     SM
                 </div>

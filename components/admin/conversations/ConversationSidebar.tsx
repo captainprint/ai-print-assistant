@@ -2,7 +2,13 @@ import ConversationSearch from "./ConversationSearch";
 import StatusFilter from "./StatusFilter";
 import ConversationList from "./ConversationList";
 
-export default function ConversationSidebar() {
+type ConversationSidebarProps = {
+  onSelectConversation?: (id: string) => void;
+};
+
+export default function ConversationSidebar({
+    onSelectConversation,
+}: ConversationSidebarProps) {
   return (
     <aside className="flex h-full min-h-0 flex-col bg-white">
       <div className="shrink-0 border-b border-gray-200 p-4">
