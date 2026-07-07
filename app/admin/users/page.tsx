@@ -45,7 +45,7 @@ export default function AdminUsersPage() {
       const params = new URLSearchParams({ page: String(page), limit: "10" });
       if (search) params.set("search", search);
 
-      const res = await apiFetch(`/api/admin/users?${params.toString()}`);
+      const res = await apiFetch(`/api/v1/admin/users?${params.toString()}`);
       const data = await res.json();
 
       if (!res.ok) {
@@ -113,7 +113,7 @@ export default function AdminUsersPage() {
       if (form.password || !isEdit) body.password = form.password;
 
       const res = await apiFetch(
-        isEdit ? `/api/admin/users/${editingUser!._id}` : "/api/admin/users",
+        isEdit ? `/api/v1/admin/users/${editingUser!._id}` : "/api/v1/admin/users",
         {
           method: isEdit ? "PUT" : "POST",
           body: JSON.stringify(body),
@@ -141,7 +141,7 @@ export default function AdminUsersPage() {
 
     setDeletingId(user._id);
     try {
-      const res = await apiFetch(`/api/admin/users/${user._id}`, {
+      const res = await apiFetch(`/api/v1/admin/users/${user._id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
