@@ -32,7 +32,7 @@ export default function ConversationPanel({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-  }, []);
+  }, [selectedConversationId, messages.length]);
 
 
   return (
