@@ -12,14 +12,14 @@ import {
 export default function CustomerInfo() {
   const [isResolved, setIsResolved] = useState(false);
   return (
-    <aside className="h-full bg-white">
-      <div className="border-b border-gray-200 px-5 py-4">
+    <aside className="flex h-full min-h-0 flex-col bg-white">
+      <div className="shrink-0 border-b border-gray-200 px-5 py-4">
         <h2 className="text-sm font-bold uppercase tracking-wide text-gray-900">
           Customer Info
         </h2>
       </div>
 
-      <div className="p-5">
+      <div className="min-h-0 flex-1 overflow-y-auto p-5">
         <div className="flex flex-col items-center border-b border-gray-200 pb-6">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
             SM

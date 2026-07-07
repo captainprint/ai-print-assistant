@@ -9,16 +9,19 @@ import ConversationPanel from "@/components/admin/conversations/ConversationPane
 export default function AdminConversationsPage() {
     return (
         <AdminLayout title="Conversations">
-            <div className="grid min-h-[calc(100vh-112px)] overflow-hidden border border-gray-200 bg-white lg:grid-cols-[380px_1fr] xl:grid-cols-[380px_1fr_280px]">
-                <ConversationSidebar />
+      <div className="grid h-[calc(100dvh-112px)] min-h-0 overflow-hidden border border-gray-200 bg-white lg:grid-cols-[380px_1fr] xl:grid-cols-[380px_1fr_280px]">
+        <div className="min-h-0 overflow-hidden">
+          <ConversationSidebar />
+        </div>
 
+        <div className="min-h-0 overflow-hidden">
+          <ConversationPanel />
+        </div>
 
-                <ConversationPanel />
-
-                <aside className="hidden xl:block w-[280px] shrink-0 border-l border-gray-200 bg-white">
-                    <CustomerInfo />
-                </aside>
-            </div>
-        </AdminLayout>
+        <aside className="hidden min-h-0 overflow-hidden border-l border-gray-200 bg-white xl:block">
+          <CustomerInfo />
+        </aside>
+      </div>
+    </AdminLayout>
     );
 }
