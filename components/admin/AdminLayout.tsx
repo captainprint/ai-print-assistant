@@ -9,9 +9,10 @@ import type { AdminUser } from "@/lib/adminAuth";
 type AdminLayoutProps = {
   title: string;
   children: React.ReactNode;
+  noPadding?: boolean;
 };
 
-export default function AdminLayout({ title, children }: AdminLayoutProps) {
+export default function AdminLayout({ title, children, noPadding = false, }: AdminLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<AdminUser | null>(null);
@@ -42,7 +43,15 @@ export default function AdminLayout({ title, children }: AdminLayoutProps) {
     <main className="min-h-screen overflow-x-hidden bg-[#f6f7f9] pt-[132px] md:pl-64 md:pt-0">
       <AdminSidebar onLogout={handleLogout} role={user?.role} />
 
-      <section className="p-4 md:p-6">{children}</section>
+      <section
+        className={
+          noPadding
+            ? "h-[calc(100dvh-132px)] p-3 md:h-dvh md:p-4"
+            : "p-4 md:p-6"
+        }
+      >
+        {children}
+      </section>
     </main>
   );
 }

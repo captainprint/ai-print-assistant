@@ -10,8 +10,8 @@ export default function AdminConversationsPage() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
 
   return (
-    <AdminLayout title="Conversations">
-      <div className="grid h-[calc(100dvh-112px)] min-h-0 overflow-hidden border border-gray-200 bg-white lg:grid-cols-[380px_1fr] xl:grid-cols-[380px_1fr_280px]">
+    <AdminLayout title="Conversations" noPadding>
+      <div className="grid h-full min-h-0 overflow-hidden border border-gray-200 bg-white lg:grid-cols-[380px_1fr] xl:grid-cols-[380px_1fr_280px]">
         
         {/* Conversation List */}
         <div
