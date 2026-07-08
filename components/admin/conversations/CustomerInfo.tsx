@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 
 export default function CustomerInfo() {
-  const [isResolved, setIsResolved] = useState(false);
+  const [status, setStatus] = useState("New");
+
   return (
     <aside className="flex h-full min-h-0 flex-col bg-white">
       <div className="shrink-0 border-b border-gray-200 px-5 py-4">
@@ -40,32 +41,41 @@ export default function CustomerInfo() {
           <InfoRow icon={MessageSquare} label="Total Conversations" value="7" />
         </div>
 
-        {/* MARK RESOLVED TOGGLE BUTTON */}
-        <div className="mt-6 rounded-xl border border-gray-200 bg-white p-3">
-          <div className="flex items-center justify-between gap-3">
+        {/* SET STATUS DROPDOWN */}
+        <div className="mt-6 rounded-xl border border-gray-200 bg-white p-4">
+          <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">
-                Issue Status
+                Conversation Status
               </p>
-              <p className="mt-1 text-[13px] text-gray-600">
-                {isResolved
-                  ? "Marked as resolved."
-                  : "Conversation is still active."}
+              <p className="mt-1 text-xs text-gray-500">
+                Update the current progress of this chat.
               </p>
             </div>
-
-            <button
-              type="button"
-              onClick={() => setIsResolved(!isResolved)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${isResolved ? "bg-green-500" : "bg-gray-300"
-                }`}
-            >
-              <span
-                className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${isResolved ? "translate-x-5" : "translate-x-0.5"
-                  }`}
-              />
-            </button>
           </div>
+
+          <div className="mt-4">
+            <label className="mb-2 block text-xs font-medium text-gray-600">
+              Status
+            </label>
+
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+              <option value="New">New</option>
+              <option value="Open">Open</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+
+          <button
+            type="button"
+            className="mt-4 h-10 w-full rounded-lg bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700"
+          >
+            Save Status
+          </button>
         </div>
 
         <div className="mt-6 rounded-xl bg-gray-100 p-3">

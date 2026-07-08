@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ChevronDown, Info } from "lucide-react";
+import { ArrowLeft, Info } from "lucide-react";
 
 type ConversationHeaderProps = {
     onBack?: () => void;
@@ -42,10 +42,6 @@ export default function ConversationHeader({
             </div>
 
             <div className="flex items-center gap-3">
-                <button className="inline-flex h-10 items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-50">
-                    <span>New</span>
-                    <ChevronDown size={16} className="text-gray-500" />
-                </button>
 
                 <button
                     onClick={onToggleCustomerInfo}
