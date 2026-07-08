@@ -21,17 +21,21 @@ export default function CustomerInfo() {
   const [status, setStatus] = useState("New");
   const [assignedUserId, setAssignedUserId] = useState("3");
   const [isAssignmentOpen, setIsAssignmentOpen] = useState(false);
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+  const [assignmentSearch, setAssignmentSearch] = useState("");
 
   const assignedUser =
     TEAM_MEMBERS.find((member) => member.id === assignedUserId) ??
     TEAM_MEMBERS[0];
 
-  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
 
   const pendingUser = TEAM_MEMBERS.find(
     (member) => member.id === pendingUserId
   );
 
+  const filteredTeamMembers = TEAM_MEMBERS.filter((member) =>
+    member.name.toLowerCase().includes(assignmentSearch.toLowerCase())
+  );
   return (
     <aside className="flex h-full min-h-0 flex-col bg-white">
       <div className="shrink-0 border-b border-gray-200 px-5 py-4">
@@ -110,7 +114,10 @@ export default function CustomerInfo() {
           <div className="relative mt-4">
             <button
               type="button"
-              onClick={() => setIsAssignmentOpen(!isAssignmentOpen)}
+              onClick={() => {
+                setIsAssignmentOpen(!isAssignmentOpen);
+                setAssignmentSearch("");
+              }}
               className="flex h-11 w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-3 text-left transition hover:border-gray-300"
             >
               <div className="flex min-w-0 items-center gap-3">
@@ -135,7 +142,17 @@ export default function CustomerInfo() {
 
             {isAssignmentOpen && (
               <div className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
-                {TEAM_MEMBERS.map((member) => (
+                <div className="border-b border-gray-100 p-3">
+                  <input
+                    type="text"
+                    value={assignmentSearch}
+                    onChange={(e) => setAssignmentSearch(e.target.value)}
+                    placeholder="Search team member..."
+                    className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
+                </div>
+
+                {filteredTeamMembers.map((member) => (
                   <button
                     key={member.id}
                     type="button"
@@ -168,51 +185,58 @@ export default function CustomerInfo() {
                     )}
                   </button>
                 ))}
+                {filteredTeamMembers.length === 0 && (
+                  <div className="px-4 py-4 text-sm text-gray-500">
+                    No team member found.
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {pendingUser && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
-            <h3 className="text-base font-semibold text-gray-900">
-              Transfer chat?
-            </h3>
+      {
+        pendingUser && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4">
+            <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
+              <h3 className="text-base font-semibold text-gray-900">
+                Transfer chat?
+              </h3>
 
-            <p className="mt-2 text-sm text-gray-600">
-              Are you sure you want to transfer this chat to{" "}
-              <span className="font-semibold text-gray-900">
-                {pendingUser.name}
-              </span>
-              ?
-            </p>
+              <p className="mt-2 text-sm text-gray-600">
+                Are you sure you want to transfer this chat to{" "}
+                <span className="font-semibold text-gray-900">
+                  {pendingUser.name}
+                </span>
+                ?
+              </p>
 
-            <div className="mt-5 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setPendingUserId(null)}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-              >
-                No
-              </button>
+              <div className="mt-5 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPendingUserId(null)}
+                  className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                >
+                  No
+                </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setAssignedUserId(pendingUser.id);
-                  setPendingUserId(null);
-                }}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
-              >
-                Yes, transfer
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAssignedUserId(pendingUser.id);
+                    setPendingUserId(null);
+                  }}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                >
+                  Yes, transfer
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </aside>
+        )
+      }
+    </aside >
   );
 }
 
