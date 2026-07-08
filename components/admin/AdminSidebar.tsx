@@ -1,15 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
   LayoutDashboard,
   MessageSquare,
-  Settings,
   Printer,
   Users,
+  KeyRound,
   LogOut,
+  ChevronUp,
 } from "lucide-react";
 
 type AdminSidebarProps = {
@@ -21,7 +23,6 @@ const ADMIN_NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/conversations", label: "Conversations", icon: MessageSquare },
   { href: "/admin/users", label: "Users", icon: Users },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 const USER_NAV_ITEMS = [
@@ -29,6 +30,8 @@ const USER_NAV_ITEMS = [
 ];
 
 export default function AdminSidebar({ onLogout, role }: AdminSidebarProps) {
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
   const pathname = usePathname();
 
   const navItems = role === "admin" ? ADMIN_NAV_ITEMS : USER_NAV_ITEMS;
@@ -58,11 +61,10 @@ export default function AdminSidebar({ onLogout, role }: AdminSidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors md:gap-3 ${
-                  active
-                    ? "bg-blue-50 text-blue-600"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors md:gap-3 ${active
+                  ? "bg-blue-50 text-blue-600"
+                  : "text-gray-600 hover:bg-gray-100"
+                  }`}
               >
                 <Icon size={18} />
                 {item.label}
@@ -81,13 +83,41 @@ export default function AdminSidebar({ onLogout, role }: AdminSidebarProps) {
         </nav>
 
         {/* Sign out pinned at bottom on desktop */}
-        <div className="hidden px-3 pb-5 md:block">
+        <div className="relative hidden px-3 pb-5 md:block">
+          {isUserMenuOpen && (
+            <div className="absolute bottom-[72px] left-3 right-3 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
+              <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <KeyRound size={16} />
+                Change password
+              </button>
+
+              <button
+                onClick={onLogout}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+              >
+                <LogOut size={16} />
+                Sign out
+              </button>
+            </div>
+          )}
+
           <button
-            onClick={onLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
+            type="button"
+            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-gray-100"
           >
-            <LogOut size={18} />
-            Sign out
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+              NB
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-gray-800">
+                Nisha Bhattarai
+              </p>
+              <p className="text-xs text-gray-500">Admin</p>
+            </div>
+
+            <ChevronUp size={16} className="text-gray-400" />
           </button>
         </div>
       </div>
