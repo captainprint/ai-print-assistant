@@ -1,12 +1,14 @@
 import StatusBadge from "./StatusBadge";
 
 type ConversationCardProps = {
+    id: string;
     name: string;
     initials: string;
     time: string;
-    status: string;
     message: string;
+    status: string;
     active?: boolean;
+    onClick?: () => void;
 };
 
 export default function ConversationCard({
@@ -15,6 +17,7 @@ export default function ConversationCard({
     time,
     status,
     message,
+    onClick,
     active = false,
 }: ConversationCardProps) {
     const statusStyles: Record<string, string> = {
@@ -28,6 +31,8 @@ export default function ConversationCard({
         statusStyles[status] ?? "bg-gray-100 text-gray-600";
     return (
         <button
+            type="button"
+            onClick={onClick}
             className={`relative w-full border-b border-gray-100 px-4 py-4 text-left transition ${active ? "bg-blue-50" : "hover:bg-gray-50"
                 }`}
         >

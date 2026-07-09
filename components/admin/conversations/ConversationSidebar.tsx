@@ -2,28 +2,41 @@ import ConversationSearch from "./ConversationSearch";
 import StatusFilter from "./StatusFilter";
 import ConversationList from "./ConversationList";
 
-export default function ConversationSidebar() {
+type ConversationSidebarProps = {
+    selectedConversationId?: string | null;
+    onSelectConversation?: (id: string) => void;
+};
+
+export default function ConversationSidebar({
+    selectedConversationId,
+    onSelectConversation,
+}: ConversationSidebarProps) {
     return (
-        <aside className="h-full bg-white">
-            <div className="border-b border-gray-200 p-4">
-                <h2 className="text-base font-semibold text-gray-900">
-                    Conversations
-                </h2>
-                <p className="mt-1 text-sm text-gray-500">
-                    Manage customer chats
-                </p>
+        <aside className="flex h-full min-h-0 flex-col bg-white">
+            <div className="shrink-0 border-b border-gray-200 p-4">
+                <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                        <h2 className="text-base font-semibold text-gray-900">
+                            Conversations
+                        </h2>
+                        <p className="mt-1 text-sm text-gray-500">
+                            Manage customer chats
+                        </p>
+                    </div>
+
+                    <StatusFilter />
+                </div>
             </div>
 
-            <div className="border-b border-gray-200 p-4">
+            <div className="shrink-0 border-b border-gray-200 p-4">
                 <ConversationSearch />
             </div>
 
-            <div className="border-b border-gray-200 p-4">
-                <StatusFilter />
-            </div>
-
-            <div>
-                <ConversationList />
+            <div className="min-h-0 flex-1 overflow-y-auto">
+                <ConversationList
+                    selectedConversationId={selectedConversationId}
+                    onSelectConversation={onSelectConversation}
+                />
             </div>
         </aside>
     );

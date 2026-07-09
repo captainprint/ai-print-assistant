@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 const options = [
-  "All Statuses",
+  "All Status",
   "New",
   "Open",
   "Resolved",

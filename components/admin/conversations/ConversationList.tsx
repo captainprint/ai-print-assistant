@@ -1,14 +1,23 @@
 import { mockConversations } from "@/data/mockConversations";
 import ConversationCard from "./ConversationCard";
 
-export default function ConversationList() {
+type ConversationListProps = {
+  selectedConversationId?: string | null;
+  onSelectConversation?: (id: string) => void;
+};
+
+export default function ConversationList({
+  selectedConversationId,
+  onSelectConversation,
+}: ConversationListProps) {
   return (
-    <div className="overflow-y-auto">
-      {mockConversations.map((conversation, index) => (
+    <div>
+      {mockConversations.map((conversation) => (
         <ConversationCard
           key={conversation.id}
           {...conversation}
-          active={index === 0}
+          active={conversation.id === selectedConversationId}
+          onClick={() => onSelectConversation?.(conversation.id)}
         />
       ))}
     </div>
