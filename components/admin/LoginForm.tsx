@@ -22,7 +22,7 @@ export default function LoginForm() {
 
     try {
       const isEmail = identifier.includes("@");
-      const endpoint = isEmail ? "/api/auth/login" : "/api/admin/login";
+      const endpoint = isEmail ? "/api/v1/auth/login" : "/api/v1/admin/login";
       const body = isEmail
         ? { email: identifier, password }
         : { username: identifier, password };
