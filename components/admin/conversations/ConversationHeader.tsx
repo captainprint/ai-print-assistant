@@ -1,14 +1,17 @@
 "use client";
 
 import { ArrowLeft, Info } from "lucide-react";
+import type { Conversation } from "@/data/mockConversations";
 
 type ConversationHeaderProps = {
+    conversation?: Conversation;
     onBack?: () => void;
     showBackButton?: boolean;
     onToggleCustomerInfo: () => void;
 };
 
 export default function ConversationHeader({
+    conversation,
     onBack,
     showBackButton,
     onToggleCustomerInfo,
@@ -20,24 +23,24 @@ export default function ConversationHeader({
                     <button
                         type="button"
                         onClick={onBack}
-                        className="shrink-0 rounded-lg p-2 text-gray-600 transition hover:bg-gray-100 md:hidden"
-                        aria-label="Back to conversations"
+                        className="shrink-0 rounded-lg p-2 text-gray-600 transition hover:bg-gray-100 xl:hidden"
+                        aria-label="Back to Conversations"
                     >
                         <ArrowLeft size={20} />
                     </button>
                 )}
 
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700 md:h-12 md:w-12">
-                    SM
+                    {conversation?.initials ?? "--"}
                 </div>
 
                 <div className="min-w-0">
                     <h2 className="truncate text-sm font-semibold text-gray-900 md:text-base">
-                        Sarah Mitchell
+                        {conversation?.name ?? "Select a conversation"}
                     </h2>
 
                     <p className="truncate text-xs text-gray-500 md:text-sm">
-                        sarah.mitchell@designco.com
+                        {conversation?.email ?? ""}
                     </p>
                 </div>
             </div>

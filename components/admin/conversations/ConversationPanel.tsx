@@ -8,6 +8,7 @@ import ReplyComposer from "./ReplyComposer";
 import CustomerInfo from "./CustomerInfo";
 import { mockMessages } from "@/data/mockMessages";
 import { mockMarcusMessages } from "@/data/mockMarcusMessages";
+import { mockConversations } from "@/data/mockConversations";
 
 type ConversationPanelProps = {
   selectedConversationId?: string | null;
@@ -34,11 +35,15 @@ export default function ConversationPanel({
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
   }, [selectedConversationId, messages.length]);
 
+  const selectedConversation = mockConversations.find(
+    (conversation) => conversation.id === selectedConversationId
+  );
 
   return (
     <>
       <section className="flex h-full min-h-0 flex-col border-l border-gray-200 bg-white rounded-2xl">
         <ConversationHeader
+          conversation={selectedConversation}
           onBack={onBack}
           showBackButton={showBackButton}
           onToggleCustomerInfo={() => setIsCustomerInfoOpen(true)}

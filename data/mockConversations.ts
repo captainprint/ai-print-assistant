@@ -1,7 +1,18 @@
-export const mockConversations = [
+export type Conversation = {
+  id: string;
+  name: string;
+  email: string;
+  initials: string;
+  time: string;
+  status: string;
+  message: string;
+};
+
+export const mockConversations: Conversation[] = [
   {
     id: "1",
     name: "Sarah Mitchell",
+    email: "sarah.mitchell@designco.com",
     initials: "SM",
     time: "2m",
     status: "New",
@@ -11,6 +22,7 @@ export const mockConversations = [
   {
     id: "2",
     name: "Marcus Brennan",
+    email: "marcus.brennan@gmail.com",
     initials: "MB",
     time: "18m",
     status: "Open",
@@ -20,6 +32,7 @@ export const mockConversations = [
   {
     id: "3",
     name: "Priya Nair",
+    email: "priya.nair@gmail.com",
     initials: "PN",
     time: "1h",
     status: "Resolved",
@@ -29,6 +42,7 @@ export const mockConversations = [
   {
     id: "4",
     name: "David Lee",
+    email: "david.lee@gmail.com",
     initials: "DL",
     time: "3h",
     status: "Waiting",
@@ -38,6 +52,7 @@ export const mockConversations = [
   {
     id: "5",
     name: "Emma Wilson",
+    email: "emma.wilson@gmail.com",
     initials: "EW",
     time: "5h",
     status: "New",
@@ -47,6 +62,7 @@ export const mockConversations = [
   {
     id: "6",
     name: "Michael Carter",
+    email: "michael.carter@gmail.com",
     initials: "MC",
     time: "7h",
     status: "Open",
@@ -56,6 +72,7 @@ export const mockConversations = [
   {
     id: "7",
     name: "Olivia Harris",
+    email: "olivia.harris@gmail.com",
     initials: "OH",
     time: "9h",
     status: "Waiting",
@@ -65,6 +82,7 @@ export const mockConversations = [
   {
     id: "8",
     name: "Daniel Kim",
+    email: "daniel.kim@gmail.com",
     initials: "DK",
     time: "Yesterday",
     status: "Resolved",
@@ -74,6 +92,7 @@ export const mockConversations = [
   {
     id: "9",
     name: "Sophia Martinez",
+    email: "sophia.martinez@gmail.com",
     initials: "SM",
     time: "Yesterday",
     status: "Open",
@@ -83,6 +102,7 @@ export const mockConversations = [
   {
     id: "10",
     name: "Ethan Roberts",
+    email: "ethan.roberts@gmail.com",
     initials: "ER",
     time: "Yesterday",
     status: "New",
@@ -92,6 +112,7 @@ export const mockConversations = [
   {
     id: "11",
     name: "Chloe Bennett",
+    email: "chloe.bennett@gmail.com",
     initials: "CB",
     time: "2d",
     status: "Waiting",
@@ -101,6 +122,7 @@ export const mockConversations = [
   {
     id: "12",
     name: "Ryan Cooper",
+    email: "ryan.cooper@gmail.com",
     initials: "RC",
     time: "2d",
     status: "Resolved",
@@ -110,6 +132,7 @@ export const mockConversations = [
   {
     id: "13",
     name: "Grace Thompson",
+    email: "grace.thompson@gmail.com",
     initials: "GT",
     time: "3d",
     status: "Open",
@@ -119,6 +142,7 @@ export const mockConversations = [
   {
     id: "14",
     name: "Noah Anderson",
+    email: "noah.anderson@gmail.com",
     initials: "NA",
     time: "4d",
     status: "New",
@@ -128,6 +152,7 @@ export const mockConversations = [
   {
     id: "15",
     name: "Isabella Scott",
+    email: "isabella.scott@gmail.com",
     initials: "IS",
     time: "5d",
     status: "Resolved",
@@ -137,6 +162,7 @@ export const mockConversations = [
   {
     id: "16",
     name: "Liam Walker",
+    email: "liam.walker@gmail.com",
     initials: "LW",
     time: "1w",
     status: "Open",
@@ -146,6 +172,7 @@ export const mockConversations = [
   {
     id: "17",
     name: "Ava Green",
+    email: "ava.green@gmail.com",
     initials: "AG",
     time: "1w",
     status: "Waiting",
@@ -155,6 +182,7 @@ export const mockConversations = [
   {
     id: "18",
     name: "Benjamin Hall",
+    email: "benjamin.hall@gmail.com",
     initials: "BH",
     time: "2w",
     status: "Resolved",

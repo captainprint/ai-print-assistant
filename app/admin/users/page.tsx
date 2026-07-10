@@ -473,18 +473,7 @@ export default function AdminUsersPage() {
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   {editingUser ? "New Password" : "Password"}
                 </label>
-                {/* <input
-                  type="password"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  placeholder={
-                    editingUser
-                      ? "Leave blank to keep current password"
-                      : "Create password"
-                  }
-                  required={!editingUser}
-                  className="h-11 w-full rounded-xl border border-gray-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                /> */}
+
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
