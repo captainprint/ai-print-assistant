@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, MoreHorizontal, X, Loader2 } from "lucide-react";
+import { Plus, MoreHorizontal, X, Loader2, Eye, EyeOff } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { apiFetch } from "@/lib/api";
 import type { User, UserRole } from "@/types/user";
@@ -37,6 +37,8 @@ export default function AdminUsersPage() {
   const [saving, setSaving] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   async function loadUsers() {
     setLoading(true);
@@ -158,9 +160,9 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <AdminLayout title="Users">
-      <div className="border border-gray-200 bg-white">
-        <div className="flex flex-col gap-4 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6">
+    <AdminLayout title="Users" noPadding>
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+        <div className="flex flex-col gap-4 border-b border-gray-200 px-3 py-4 sm:flex-row sm:items-center sm:justify-between md:px-4">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Users</h2>
             <p className="mt-1 text-sm text-gray-500">
@@ -231,22 +233,20 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="px-4 py-4 md:px-6">
                         <span
-                          className={`rounded-full px-2 py-1 text-xs font-medium ${
-                            user.role === "admin"
-                              ? "bg-blue-50 text-blue-700"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${user.role === "admin"
+                            ? "bg-blue-50 text-blue-700"
+                            : "bg-gray-100 text-gray-600"
+                            }`}
                         >
                           {user.role === "admin" ? "Admin" : "User"}
                         </span>
                       </td>
                       <td className="px-4 py-4 md:px-6">
                         <span
-                          className={`rounded-full px-2 py-1 text-xs font-medium ${
-                            user.isActive
-                              ? "bg-green-50 text-green-700"
-                              : "bg-gray-100 text-gray-500"
-                          }`}
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${user.isActive
+                            ? "bg-green-50 text-green-700"
+                            : "bg-gray-100 text-gray-500"
+                            }`}
                         >
                           {user.isActive ? "Active" : "Inactive"}
                         </span>
@@ -304,20 +304,18 @@ export default function AdminUsersPage() {
                       <p className="mt-1 text-sm text-gray-500">{user.phone}</p>
                       <div className="mt-2 flex items-center gap-2">
                         <span
-                          className={`rounded-full px-2 py-1 text-xs font-medium ${
-                            user.role === "admin"
-                              ? "bg-blue-50 text-blue-700"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${user.role === "admin"
+                            ? "bg-blue-50 text-blue-700"
+                            : "bg-gray-100 text-gray-600"
+                            }`}
                         >
                           {user.role === "admin" ? "Admin" : "User"}
                         </span>
                         <span
-                          className={`rounded-full px-2 py-1 text-xs font-medium ${
-                            user.isActive
-                              ? "bg-green-50 text-green-700"
-                              : "bg-gray-100 text-gray-500"
-                          }`}
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${user.isActive
+                            ? "bg-green-50 text-green-700"
+                            : "bg-gray-100 text-gray-500"
+                            }`}
                         >
                           {user.isActive ? "Active" : "Inactive"}
                         </span>
@@ -384,21 +382,29 @@ export default function AdminUsersPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {editingUser ? "Edit User" : "Add User"}
-              </h3>
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl modal-enter">
+            <div className="flex items-start justify-between border-b border-gray-200 px-6 py-5">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {editingUser ? "Edit User" : "Add New User"}
+                </h3>
+
+                <p className="mt-1 text-sm text-gray-500">
+                  {editingUser
+                    ? "Update this team member's information."
+                    : "Create a new staff account."}
+                </p>
+              </div>
 
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="rounded-lg p-1 text-gray-500 hover:bg-gray-100"
+                className="rounded-full p-2 transition hover:bg-gray-100"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 px-5 py-5">
+            <form onSubmit={handleSubmit} className="space-y-6 px-6 py-6">
               {formError && (
                 <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
                   {formError}
@@ -415,7 +421,7 @@ export default function AdminUsersPage() {
                   onChange={(e) => setForm({ ...form, fullName: e.target.value })}
                   placeholder="Enter full name"
                   required
-                  className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="h-11 w-full rounded-xl border border-gray-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
@@ -429,7 +435,7 @@ export default function AdminUsersPage() {
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="Enter email address"
                   required
-                  className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="h-11 w-full rounded-xl border border-gray-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
@@ -443,7 +449,7 @@ export default function AdminUsersPage() {
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   placeholder="Enter phone number"
                   required
-                  className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="h-11 w-full rounded-xl border border-gray-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
@@ -456,7 +462,7 @@ export default function AdminUsersPage() {
                   onChange={(e) =>
                     setForm({ ...form, role: e.target.value as UserRole })
                   }
-                  className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="h-11 w-full rounded-xl border border-gray-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -467,7 +473,7 @@ export default function AdminUsersPage() {
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   {editingUser ? "New Password" : "Password"}
                 </label>
-                <input
+                {/* <input
                   type="password"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -477,15 +483,40 @@ export default function AdminUsersPage() {
                       : "Create password"
                   }
                   required={!editingUser}
-                  className="h-11 w-full border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                />
+                  className="h-11 w-full rounded-xl border border-gray-300 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                /> */}
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={form.password}
+                    onChange={(e) =>
+                      setForm({ ...form, password: e.target.value })
+                    }
+                    placeholder={
+                      editingUser
+                        ? "Leave blank to keep current password"
+                        : "Create password"
+                    }
+                    required={!editingUser}
+                    className="h-11 w-full rounded-xl border border-gray-300 px-3 pr-11 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-400 transition hover:text-gray-600"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3">
+              <div className="mt-2 flex items-center justify-end gap-3 border-t border-gray-200 pt-5">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="inline-flex h-11 items-center justify-center rounded-xl border border-gray-300 bg-white px-5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:border-gray-400"
                 >
                   Cancel
                 </button>
@@ -493,9 +524,9 @@ export default function AdminUsersPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex items-center gap-2 bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {saving && <Loader2 size={14} className="animate-spin" />}
+                  {saving && <Loader2 size={16} className="animate-spin" />}
                   {editingUser ? "Save Changes" : "Add User"}
                 </button>
               </div>

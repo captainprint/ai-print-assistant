@@ -11,7 +11,7 @@ export default function AdminConversationsPage() {
 
   return (
     <AdminLayout title="Conversations" noPadding>
-      <div className="grid h-full min-h-0 overflow-hidden border border-gray-200 bg-white lg:grid-cols-[380px_1fr] xl:grid-cols-[380px_1fr_280px]">
+      <div className="grid h-full min-h-0 overflow-hidden rounded-2xl border border-gray-200 bg-white lg:grid-cols-[380px_1fr] xl:grid-cols-[380px_1fr_280px]">
         
         {/* Conversation List */}
         <div

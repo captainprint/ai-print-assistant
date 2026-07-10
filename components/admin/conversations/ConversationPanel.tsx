@@ -37,7 +37,7 @@ export default function ConversationPanel({
 
   return (
     <>
-      <section className="flex h-full min-h-0 flex-col border-l border-gray-200 bg-white">
+      <section className="flex h-full min-h-0 flex-col border-l border-gray-200 bg-white rounded-2xl">
         <ConversationHeader
           onBack={onBack}
           showBackButton={showBackButton}
