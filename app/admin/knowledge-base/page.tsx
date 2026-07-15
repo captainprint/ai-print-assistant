@@ -15,6 +15,7 @@ export default function KnowledgeBasePage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [files, setFiles] = useState<KnowledgeFile[]>([]);
     const [fileToDelete, setFileToDelete] = useState<KnowledgeFile | null>(null);
+    const [duplicateFileName, setDuplicateFileName] = useState<string | null>(null);
 
     function handleUploadClick() {
         fileInputRef.current?.click();
@@ -29,7 +30,19 @@ export default function KnowledgeBasePage() {
             return;
         }
 
-        const newFiles: KnowledgeFile[] = Array.from(selectedFiles).map(
+        const existingFileNames = new Set(
+            files.map((file) => file.name.toLowerCase())
+        );
+
+        const uniqueSelectedFiles = Array.from(selectedFiles).filter(
+            (file) => !existingFileNames.has(file.name.toLowerCase())
+        );
+
+        const duplicateFiles = Array.from(selectedFiles).filter(
+            (file) => existingFileNames.has(file.name.toLowerCase())
+        );
+
+        const newFiles: KnowledgeFile[] = uniqueSelectedFiles.map(
             (file) => ({
                 id: crypto.randomUUID(),
                 name: file.name,
@@ -42,6 +55,14 @@ export default function KnowledgeBasePage() {
         );
 
         setFiles((currentFiles) => [...newFiles, ...currentFiles]);
+
+        if (duplicateFiles.length > 0) {
+            setDuplicateFileName(
+                duplicateFiles.length === 1
+                    ? duplicateFiles[0].name
+                    : `${duplicateFiles.length} files`
+            );
+        }
 
         event.target.value = "";
     }
@@ -148,6 +169,33 @@ export default function KnowledgeBasePage() {
                                     className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
                                 >
                                     Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {duplicateFileName && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                File already uploaded
+                            </h3>
+
+                            <p className="mt-2 text-sm text-gray-500">
+                                <span className="font-medium text-gray-900">
+                                    {duplicateFileName}
+                                </span>{" "}
+                                is already in the Knowledge Base and was not uploaded again.
+                            </p>
+
+                            <div className="mt-6 flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => setDuplicateFileName(null)}
+                                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                                >
+                                    Okay
                                 </button>
                             </div>
                         </div>
