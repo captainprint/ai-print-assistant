@@ -17,13 +17,22 @@ export default function KnowledgeBasePage() {
     const [fileToDelete, setFileToDelete] = useState<KnowledgeFile | null>(null);
     const [duplicateFileName, setDuplicateFileName] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [invalidFileMessage, setInvalidFileMessage] = useState<string | null>(null);
 
     function handleUploadClick() {
         fileInputRef.current?.click();
     }
 
     function processFiles(selectedFiles: File[]) {
-        const allowedExtensions = ["pdf", "doc", "docx", "xls", "xlsx"];
+        const allowedExtensions = [
+            "pdf",
+            "doc",
+            "docx",
+            "xls",
+            "xlsx",
+            "csv",
+            "txt",
+        ];
 
         const validFiles = selectedFiles.filter((file) => {
             const extension = file.name.split(".").pop()?.toLowerCase();
@@ -66,6 +75,14 @@ export default function KnowledgeBasePage() {
                 duplicateFiles.length === 1
                     ? duplicateFiles[0].name
                     : `${duplicateFiles.length} files`
+            );
+        }
+
+        if (invalidFiles.length > 0) {
+            setInvalidFileMessage(
+                invalidFiles.length === 1
+                    ? invalidFiles[0].name
+                    : `${invalidFiles.length} files`
             );
         }
     }
@@ -243,13 +260,44 @@ export default function KnowledgeBasePage() {
                                 <span className="font-medium text-gray-900">
                                     {duplicateFileName}
                                 </span>{" "}
-                                is already in the Knowledge Base and was not uploaded again.
+                                is already in the Knowledge Base and  cannot be uploaded again.
                             </p>
 
                             <div className="mt-6 flex justify-end">
                                 <button
                                     type="button"
                                     onClick={() => setDuplicateFileName(null)}
+                                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                                >
+                                    Okay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {invalidFileMessage && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Unsupported File Type
+                            </h3>
+
+                            <p className="mt-2 text-sm text-gray-500">
+                                <span className="font-medium text-gray-900">
+                                    {invalidFileMessage}
+                                </span>{" "}
+                                is not a supported file type.
+                            </p>
+
+                            <p className="mt-4 text-sm text-gray-500">
+                                Only PDF, Word (.doc, .docx), Excel (.xls, .xlsx), CSV, and TXT files can be uploaded to the Knowledge Base.
+                            </p>
+
+                            <div className="mt-6 flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => setInvalidFileMessage(null)}
                                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                                 >
                                     Okay
