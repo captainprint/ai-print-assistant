@@ -16,9 +16,44 @@ export default function KnowledgeBasePage() {
     const [files, setFiles] = useState<KnowledgeFile[]>([]);
     const [fileToDelete, setFileToDelete] = useState<KnowledgeFile | null>(null);
     const [duplicateFileName, setDuplicateFileName] = useState<string | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
 
     function handleUploadClick() {
         fileInputRef.current?.click();
+    }
+
+    function processFiles(selectedFiles: File[]) {
+        const existingFileNames = new Set(
+            files.map((file) => file.name.toLowerCase())
+        );
+
+        const uniqueFiles = selectedFiles.filter(
+            (file) => !existingFileNames.has(file.name.toLowerCase())
+        );
+
+        const duplicateFiles = selectedFiles.filter(
+            (file) => existingFileNames.has(file.name.toLowerCase())
+        );
+
+        const newFiles: KnowledgeFile[] = uniqueFiles.map((file) => ({
+            id: crypto.randomUUID(),
+            name: file.name,
+            uploadedAt: new Date().toLocaleDateString("en-CA", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+            }),
+        }));
+
+        setFiles((currentFiles) => [...newFiles, ...currentFiles]);
+
+        if (duplicateFiles.length > 0) {
+            setDuplicateFileName(
+                duplicateFiles.length === 1
+                    ? duplicateFiles[0].name
+                    : `${duplicateFiles.length} files`
+            );
+        }
     }
 
     function handleFileChange(
@@ -30,39 +65,7 @@ export default function KnowledgeBasePage() {
             return;
         }
 
-        const existingFileNames = new Set(
-            files.map((file) => file.name.toLowerCase())
-        );
-
-        const uniqueSelectedFiles = Array.from(selectedFiles).filter(
-            (file) => !existingFileNames.has(file.name.toLowerCase())
-        );
-
-        const duplicateFiles = Array.from(selectedFiles).filter(
-            (file) => existingFileNames.has(file.name.toLowerCase())
-        );
-
-        const newFiles: KnowledgeFile[] = uniqueSelectedFiles.map(
-            (file) => ({
-                id: crypto.randomUUID(),
-                name: file.name,
-                uploadedAt: new Date().toLocaleDateString("en-CA", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                }),
-            })
-        );
-
-        setFiles((currentFiles) => [...newFiles, ...currentFiles]);
-
-        if (duplicateFiles.length > 0) {
-            setDuplicateFileName(
-                duplicateFiles.length === 1
-                    ? duplicateFiles[0].name
-                    : `${duplicateFiles.length} files`
-            );
-        }
+        processFiles(Array.from(selectedFiles));
 
         event.target.value = "";
     }
@@ -73,6 +76,34 @@ export default function KnowledgeBasePage() {
         );
     }
 
+    function handleDragOver(
+        event: React.DragEvent<HTMLDivElement>
+    ) {
+        event.preventDefault();
+        setIsDragging(true);
+    }
+
+    function handleDragLeave(
+        event: React.DragEvent<HTMLDivElement>
+    ) {
+        event.preventDefault();
+        setIsDragging(false);
+    }
+
+    function handleDrop(
+        event: React.DragEvent<HTMLDivElement>
+    ) {
+        event.preventDefault();
+        setIsDragging(false);
+
+        const droppedFiles = Array.from(event.dataTransfer.files);
+
+        if (droppedFiles.length === 0) {
+            return;
+        }
+
+        processFiles(droppedFiles);
+    }
 
     return (
         <AdminLayout title="Knowledge Base" noPadding>
@@ -97,21 +128,33 @@ export default function KnowledgeBasePage() {
                     onChange={handleFileChange}
                 />
 
-                <div className="mt-8 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 px-6 py-16 text-center">
+                <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`mt-8 flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-16 text-center transition ${isDragging
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-gray-200 bg-gray-50"
+                        }`}
+                >
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-600">
                         <Upload size={28} />
                     </div>
 
                     <h3 className="mt-5 text-lg font-semibold text-gray-900">
-                        {files.length === 0
-                            ? "No files uploaded yet"
-                            : "Add more files"}
+                        {isDragging
+                            ? "Drop files here"
+                            : files.length === 0
+                                ? "Drag and drop files here"
+                                : "Add more files"}
                     </h3>
 
                     <p className="mt-2 max-w-md text-sm text-gray-500">
-                        {files.length === 0
-                            ? "Upload product catalogs, printing guides, FAQs, pricing sheets, and other documents to help your AI assistant answer customer questions."
-                            : "Upload additional documents to keep your AI assistant's knowledge up to date."}
+                        {isDragging
+                            ? "Release the files to add them to the Knowledge Base."
+                            : files.length === 0
+                                ? "Drag files here or use the button below to upload product catalogs, printing guides, FAQs, and pricing sheets."
+                                : "Drag additional files here or use the button below to keep your AI assistant up to date."}
                     </p>
 
                     <button
