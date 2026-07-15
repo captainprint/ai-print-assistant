@@ -23,16 +23,30 @@ export default function KnowledgeBasePage() {
     }
 
     function processFiles(selectedFiles: File[]) {
+        const allowedExtensions = ["pdf", "doc", "docx", "xls", "xlsx"];
+
+        const validFiles = selectedFiles.filter((file) => {
+            const extension = file.name.split(".").pop()?.toLowerCase();
+
+            return extension && allowedExtensions.includes(extension);
+        });
+
+        const invalidFiles = selectedFiles.filter((file) => {
+            const extension = file.name.split(".").pop()?.toLowerCase();
+
+            return !extension || !allowedExtensions.includes(extension);
+        });
+
         const existingFileNames = new Set(
             files.map((file) => file.name.toLowerCase())
         );
 
-        const uniqueFiles = selectedFiles.filter(
+        const uniqueFiles = validFiles.filter(
             (file) => !existingFileNames.has(file.name.toLowerCase())
         );
 
-        const duplicateFiles = selectedFiles.filter(
-            (file) => existingFileNames.has(file.name.toLowerCase())
+        const duplicateFiles = validFiles.filter((file) =>
+            existingFileNames.has(file.name.toLowerCase())
         );
 
         const newFiles: KnowledgeFile[] = uniqueFiles.map((file) => ({
@@ -124,7 +138,7 @@ export default function KnowledgeBasePage() {
                     type="file"
                     multiple
                     className="hidden"
-                    accept=".pdf,.doc,.docx,.txt,.csv"
+                    accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx"
                     onChange={handleFileChange}
                 />
 
@@ -133,8 +147,8 @@ export default function KnowledgeBasePage() {
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                     className={`mt-8 flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-16 text-center transition ${isDragging
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200 bg-gray-50"
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 bg-gray-50"
                         }`}
                 >
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-600">
