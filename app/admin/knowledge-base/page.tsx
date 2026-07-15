@@ -54,14 +54,14 @@ export default function KnowledgeBasePage() {
 
     return (
         <AdminLayout title="Knowledge Base" noPadding>
-            <div className="rounded-2xl border border-gray-200 bg-white p-4 md:p-6">
+            <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 md:p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
+                    <div className="min-w-0">
                         <h2 className="text-lg font-semibold text-gray-900">
                             Knowledge Base
                         </h2>
 
-                        <p className="mt-2 text-sm text-gray-500">
+                        <p className="mt-2 max-w-2xl text-sm text-gray-500">
                             Upload files that your AI assistant can use to answer customer
                             questions.
                         </p>
@@ -80,7 +80,7 @@ export default function KnowledgeBasePage() {
                         <button
                             type="button"
                             onClick={handleUploadClick}
-                            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 sm:w-auto"
                         >
                             <Upload size={16} />
                             Upload Files
@@ -89,7 +89,7 @@ export default function KnowledgeBasePage() {
                 </div>
 
                 {files.length > 0 && (
-                    <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                         {files.map((file) => (
                             <KnowledgeFileCard
                                 key={file.id}

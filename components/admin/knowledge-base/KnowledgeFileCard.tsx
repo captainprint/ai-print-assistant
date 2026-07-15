@@ -16,14 +16,14 @@ export default function KnowledgeFileCard({
   onRemove,
 }: KnowledgeFileCardProps) {
   return (
-    <div className="rounded-xl border border-gray-200 p-4 transition hover:border-gray-300">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
+    <div className="min-w-0 rounded-xl border border-gray-200 p-4 transition hover:border-gray-300 hover:shadow-sm">
+      <div className="flex min-w-0 items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
             <FileText size={20} />
           </div>
 
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p
               className="truncate text-sm font-medium text-gray-900"
               title={file.name}
