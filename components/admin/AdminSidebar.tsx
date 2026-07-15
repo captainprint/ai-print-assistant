@@ -12,6 +12,7 @@ import {
   KeyRound,
   LogOut,
   ChevronUp,
+  BookOpen
 } from "lucide-react";
 
 type AdminSidebarProps = {
@@ -23,6 +24,7 @@ const ADMIN_NAV_ITEMS = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/conversations", label: "Conversations", icon: MessageSquare },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/knowledge-base", label: "Knowledge Base", icon: BookOpen },
 ];
 
 const USER_NAV_ITEMS = [
