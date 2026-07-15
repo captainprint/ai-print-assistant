@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Upload, FileText, Trash2 } from "lucide-react";
+import { Upload } from "lucide-react";
+import KnowledgeFileCard from "@/components/admin/knowledge-base/KnowledgeFileCard";
 
 type KnowledgeFile = {
     id: string;
@@ -44,11 +45,11 @@ export default function KnowledgeBasePage() {
         event.target.value = "";
     }
 
-     function handleRemoveFile(id: string) {
-            setFiles((currentFiles) =>
-                currentFiles.filter((file) => file.id !== id)
-            );
-        }
+    function handleRemoveFile(id: string) {
+        setFiles((currentFiles) =>
+            currentFiles.filter((file) => file.id !== id)
+        );
+    }
 
 
     return (
@@ -90,40 +91,11 @@ export default function KnowledgeBasePage() {
                 {files.length > 0 && (
                     <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                         {files.map((file) => (
-                            <div
+                            <KnowledgeFileCard
                                 key={file.id}
-                                className="rounded-xl border border-gray-200 p-4 transition hover:border-gray-300"
-                            >
-                                <div className="flex items-start justify-between gap-3">
-                                    <div className="flex items-start gap-3">
-                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                                            <FileText size={20} />
-                                        </div>
-
-                                        <div className="min-w-0">
-                                            <p
-                                                className="truncate text-sm font-medium text-gray-900"
-                                                title={file.name}
-                                            >
-                                                {file.name}
-                                            </p>
-
-                                            <p className="mt-1 text-xs text-gray-500">
-                                                Uploaded {file.uploadedAt}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveFile(file.id)}
-                                        className="rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
-                                        aria-label={`Remove ${file.name}`}
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </div>
-                            </div>
+                                file={file}
+                                onRemove={handleRemoveFile}
+                            />
                         ))}
                     </div>
                 )}
