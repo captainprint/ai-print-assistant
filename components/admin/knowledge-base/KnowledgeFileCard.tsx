@@ -8,7 +8,7 @@ type KnowledgeFile = {
 
 type KnowledgeFileCardProps = {
   file: KnowledgeFile;
-  onRemove: (id: string) => void;
+  onRemove: (file: KnowledgeFile) => void;
 };
 
 export default function KnowledgeFileCard({
@@ -39,7 +39,7 @@ export default function KnowledgeFileCard({
 
         <button
           type="button"
-          onClick={() => onRemove(file.id)}
+          onClick={() => onRemove(file)}
           className="shrink-0 rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
           aria-label={`Remove ${file.name}`}
         >
