@@ -15,9 +15,12 @@ import {
   BookOpen
 } from "lucide-react";
 
+import { getInitials } from "@/lib/adminAuth";
+import type { AdminUser } from "@/lib/adminAuth";
+
 type AdminSidebarProps = {
   onLogout: () => void;
-  role?: string;
+  user: AdminUser | null;
 };
 
 const ADMIN_NAV_ITEMS = [
@@ -31,12 +34,16 @@ const USER_NAV_ITEMS = [
   { href: "/user/conversations", label: "Conversations", icon: MessageSquare },
 ];
 
-export default function AdminSidebar({ onLogout, role }: AdminSidebarProps) {
+export default function AdminSidebar({ onLogout, user }: AdminSidebarProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const pathname = usePathname();
 
+  const role = user?.role;
   const navItems = role === "admin" ? ADMIN_NAV_ITEMS : USER_NAV_ITEMS;
+  const displayName = user?.fullName || user?.username || user?.email || "";
+  const roleLabel = role === "admin" ? "Admin" : "User";
+  const initials = user ? getInitials(user) : "";
 
   return (
     <aside className="fixed left-0 top-0 z-40 w-full border-b border-gray-200 bg-white md:h-screen md:w-64 md:border-b-0 md:border-r">
@@ -62,10 +69,10 @@ export default function AdminSidebar({ onLogout, role }: AdminSidebarProps) {
             <div className="absolute right-0 top-12 w-56 rounded-xl border border-gray-200 bg-white p-2 shadow-xl">
               <div className="border-b border-gray-100 px-3 py-2">
                 <p className="text-sm font-semibold text-gray-900">
-                  Nisha Bhattarai
+                  {displayName}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Admin
+                  {roleLabel}
                 </p>
               </div>
 
@@ -89,7 +96,7 @@ export default function AdminSidebar({ onLogout, role }: AdminSidebarProps) {
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700 transition hover:bg-blue-200"
           >
-            NB
+            {initials}
           </button>
         </div>
       </div>
@@ -143,14 +150,14 @@ export default function AdminSidebar({ onLogout, role }: AdminSidebarProps) {
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-gray-100"
           >
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
-              NB
+              {initials}
             </div>
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-gray-800">
-                Nisha Bhattarai
+                {displayName}
               </p>
-              <p className="text-xs text-gray-500">Admin</p>
+              <p className="text-xs text-gray-500">{roleLabel}</p>
             </div>
 
             <ChevronUp size={16} className="text-gray-400" />
