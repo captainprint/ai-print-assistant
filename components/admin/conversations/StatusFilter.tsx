@@ -1,28 +1,34 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
 
-const options = [
-  "All Status",
-  "New",
-  "Open",
-  "Resolved",
+export type StatusFilterValue = "all" | "unassigned" | "assigned" | "closed";
+
+const options: { label: string; value: StatusFilterValue }[] = [
+  { label: "All Status", value: "all" },
+  { label: "New", value: "unassigned" },
+  { label: "Open", value: "assigned" },
+  { label: "Resolved", value: "closed" },
 ];
 
-export default function StatusFilter() {
-  const [selected, setSelected] = useState("All Statuses");
+type StatusFilterProps = {
+  value: StatusFilterValue;
+  onChange: (value: StatusFilterValue) => void;
+};
 
+export default function StatusFilter({ value, onChange }: StatusFilterProps) {
   return (
     <div className="flex justify-end">
       <div className="relative">
         <select
-          value={selected}
-          onChange={(e) => setSelected(e.target.value)}
+          value={value}
+          onChange={(e) => onChange(e.target.value as StatusFilterValue)}
           className="h-9 appearance-none rounded-lg border border-gray-200 bg-white py-1.5 pl-3 pr-9 text-xs font-medium text-gray-700 outline-none transition hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         >
           {options.map((option) => (
-            <option key={option}>{option}</option>
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
           ))}
         </select>
 

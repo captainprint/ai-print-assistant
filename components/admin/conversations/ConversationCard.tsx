@@ -1,4 +1,5 @@
 import StatusBadge from "./StatusBadge";
+import type { DisplayStatus } from "@/lib/conversations";
 
 type ConversationCardProps = {
     id: string;
@@ -6,7 +7,7 @@ type ConversationCardProps = {
     initials: string;
     time: string;
     message: string;
-    status: string;
+    status: DisplayStatus;
     active?: boolean;
     onClick?: () => void;
 };
@@ -20,15 +21,6 @@ export default function ConversationCard({
     onClick,
     active = false,
 }: ConversationCardProps) {
-    const statusStyles: Record<string, string> = {
-        New: "bg-blue-100 text-blue-700",
-        Open: "bg-green-100 text-green-700",
-        Waiting: "bg-amber-100 text-amber-700",
-        Resolved: "bg-gray-100 text-gray-600",
-    };
-
-    const badgeClass =
-        statusStyles[status] ?? "bg-gray-100 text-gray-600";
     return (
         <button
             type="button"
@@ -54,7 +46,7 @@ export default function ConversationCard({
                     <p className="mt-1 line-clamp-2 text-sm text-gray-500">{message}</p>
 
                     <div className="mt-3">
-                        <StatusBadge status={status as any} />
+                        <StatusBadge status={status} />
                     </div>
                 </div>
             </div>

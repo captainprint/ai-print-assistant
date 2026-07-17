@@ -1,5 +1,5 @@
 type StatusBadgeProps = {
-  status: "New" | "Open" | "Waiting" | "Resolved";
+  status: "New" | "Open" | "Resolved";
 };
 
 export default function StatusBadge({
@@ -8,7 +8,6 @@ export default function StatusBadge({
   const styles = {
     New: "bg-blue-100 text-blue-700",
     Open: "bg-green-100 text-green-700",
-    Waiting: "bg-amber-100 text-amber-700",
     Resolved: "bg-gray-100 text-gray-600",
   };
 
