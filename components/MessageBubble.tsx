@@ -1,10 +1,14 @@
 import { UserRound } from "lucide-react";
+import RecommendationCards from "./RecommendationCards";
+import type { ChatRecommendation, MatchedImageGroup } from "@/lib/chat";
 
 type Props = {
   role: "ai" | "user";
   message: string;
   time: string;
   isTyping?: boolean;
+  recommendations?: ChatRecommendation[];
+  images?: MatchedImageGroup[];
 };
 
 export default function MessageBubble({
@@ -12,6 +16,8 @@ export default function MessageBubble({
   message,
   time,
   isTyping,
+  recommendations,
+  images,
 }: Props) {
   if (role === "ai") {
     return (
@@ -20,7 +26,7 @@ export default function MessageBubble({
           AI
         </div>
 
-        <div className="max-w-[320px] rounded-xl bg-white border border-gray-200 px-5 py-4 shadow-sm">
+        <div className="max-w-[420px] rounded-xl bg-white border border-gray-200 px-5 py-4 shadow-sm">
           {isTyping ? (
             <div className="flex items-center gap-1 py-1">
               <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" />
@@ -31,6 +37,10 @@ export default function MessageBubble({
             <p className="text-[16px] leading-relaxed text-gray-900">
               {message}
             </p>
+          )}
+
+          {!isTyping && recommendations && recommendations.length > 0 && (
+            <RecommendationCards recommendations={recommendations} images={images ?? []} />
           )}
 
           {!isTyping && (

@@ -60,6 +60,8 @@ export default function ChatArea({
             message={message.message}
             time={message.time}
             isTyping={message.isTyping}
+            recommendations={message.recommendations}
+            images={message.images}
           />
         ))}
 
