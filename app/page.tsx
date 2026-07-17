@@ -24,7 +24,7 @@ function formatTimestamp(timestamp: string) {
 const GREETING: Message = {
   role: "ai",
   message:
-    "Hello! I'm your AI Print Assistant. I can help you with printing services, paper types, file formats, finishing options, turnaround times, and more. How can I assist you today?",
+    "Hey! I'm Alex, your print assistant. I can help you with printing services, paper types, file formats, finishing options, turnaround times, and more. How can I assist you today?",
   time: getCurrentTime(),
   suggestions: [
     "I need business cards",
