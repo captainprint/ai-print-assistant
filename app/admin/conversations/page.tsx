@@ -40,7 +40,7 @@ export default function AdminConversationsPage() {
 
         {/* Customer Info - Desktop Only */}
         <aside className="hidden min-h-0 overflow-hidden border-l border-gray-200 bg-white xl:block">
-          <CustomerInfo />
+          <CustomerInfo sessionId={selectedConversationId} />
         </aside>
       </div>
     </AdminLayout>
