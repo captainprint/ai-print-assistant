@@ -6,9 +6,11 @@ import { Send } from "lucide-react";
 type Props = {
   onSendMessage: (message: string) => void;
   isAiTyping: boolean;
+  disabled?: boolean;
+  disabledReason?: string;
 };
 
-export default function ChatInput({ onSendMessage, isAiTyping }: Props) {
+export default function ChatInput({ onSendMessage, isAiTyping, disabled, disabledReason }: Props) {
   const [input, setInput] = useState("");
 
   const handleSubmit = () => {
@@ -20,7 +22,8 @@ export default function ChatInput({ onSendMessage, isAiTyping }: Props) {
     setInput("");
   };
 
-  const isDisabled = !input.trim() || isAiTyping;
+  const isInputDisabled = isAiTyping || !!disabled;
+  const isDisabled = !input.trim() || isInputDisabled;
 
   return (
     <footer className="bg-white border-t border-gray-200">
@@ -29,15 +32,20 @@ export default function ChatInput({ onSendMessage, isAiTyping }: Props) {
           <input
             type="text"
             value={input}
-            disabled={isAiTyping}
+            disabled={isInputDisabled}
+            maxLength={500}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 handleSubmit();
               }
             }}
-            placeholder="Not sure what to print? Ask me anything....."
-            className="flex-1 h-14 rounded-xl border-2 border-[#3157F6] px-4 text-[16px] text-gray-900 placeholder:text-[12px] placeholder:text-gray-500 outline-none"
+            placeholder={
+              disabled
+                ? disabledReason || "This conversation has been handed off to our team."
+                : "Not sure what to print? Ask me anything....."
+            }
+            className="flex-1 h-14 rounded-xl border-2 border-[#3157F6] px-4 text-[16px] text-gray-900 placeholder:text-[12px] placeholder:text-gray-500 outline-none disabled:bg-gray-50 disabled:text-gray-400"
           />
 
           <button
