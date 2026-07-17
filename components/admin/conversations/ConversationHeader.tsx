@@ -1,10 +1,10 @@
 "use client";
 
 import { ArrowLeft, Info } from "lucide-react";
-import type { Conversation } from "@/data/mockConversations";
+import { initialsFromName, type ConversationDetail } from "@/lib/conversations";
 
 type ConversationHeaderProps = {
-    conversation?: Conversation;
+    conversation?: ConversationDetail | null;
     onBack?: () => void;
     showBackButton?: boolean;
     onToggleCustomerInfo: () => void;
@@ -16,6 +16,8 @@ export default function ConversationHeader({
     showBackButton,
     onToggleCustomerInfo,
 }: ConversationHeaderProps) {
+    const name = conversation?.customerProfile?.name || (conversation ? "Unknown customer" : undefined);
+
     return (
         <header className="flex min-w-0 items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-3 md:px-6 md:py-4">
             <div className="flex min-w-0 items-center gap-3">
@@ -31,16 +33,16 @@ export default function ConversationHeader({
                 )}
 
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700 md:h-12 md:w-12">
-                    {conversation?.initials ?? "--"}
+                    {conversation ? initialsFromName(conversation.customerProfile?.name) : "--"}
                 </div>
 
                 <div className="min-w-0">
                     <h2 className="truncate text-sm font-semibold text-gray-900 md:text-base">
-                        {conversation?.name ?? "Select a conversation"}
+                        {name ?? "Select a conversation"}
                     </h2>
 
                     <p className="truncate text-xs text-gray-500 md:text-sm">
-                        {conversation?.email ?? ""}
+                        {conversation?.customerProfile?.email ?? ""}
                     </p>
                 </div>
             </div>

@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import ConversationHeader from "./ConversationHeader";
 import ConversationMessages from "./ConversationMessages";
 import ReplyComposer from "./ReplyComposer";
 import CustomerInfo from "./CustomerInfo";
-import { mockMessages } from "@/data/mockMessages";
-import { mockMarcusMessages } from "@/data/mockMarcusMessages";
-import { mockConversations } from "@/data/mockConversations";
+import {
+  getConversation,
+  sendStaffReply,
+  mergeMessages,
+  type ConversationDetail,
+} from "@/lib/conversations";
 
 type ConversationPanelProps = {
   selectedConversationId?: string | null;
@@ -22,35 +25,74 @@ export default function ConversationPanel({
   showBackButton = false,
 }: ConversationPanelProps) {
   const [isCustomerInfoOpen, setIsCustomerInfoOpen] = useState(false);
-  const messages =
-    selectedConversationId === "1"
-      ? mockMessages
-      : selectedConversationId === "2"
-        ? mockMarcusMessages
-        : [];
-
+  const [conversation, setConversation] = useState<ConversationDetail | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const loadConversation = useCallback(() => {
+    if (!selectedConversationId) {
+      setConversation(null);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    getConversation(selectedConversationId)
+      .then(setConversation)
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : "Failed to load conversation");
+      })
+      .finally(() => setLoading(false));
+  }, [selectedConversationId]);
+
+  useEffect(() => {
+    loadConversation();
+  }, [loadConversation]);
+
+  const messages = conversation ? mergeMessages(conversation) : [];
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
   }, [selectedConversationId, messages.length]);
 
-  const selectedConversation = mockConversations.find(
-    (conversation) => conversation.id === selectedConversationId
-  );
+  async function handleSend(message: string) {
+    if (!selectedConversationId) return;
+    setSending(true);
+    try {
+      await sendStaffReply(selectedConversationId, message);
+      loadConversation();
+    } finally {
+      setSending(false);
+    }
+  }
 
   return (
     <>
       <section className="flex h-full min-h-0 flex-col border-l border-gray-200 bg-white rounded-2xl">
         <ConversationHeader
-          conversation={selectedConversation}
+          conversation={conversation}
           onBack={onBack}
           showBackButton={showBackButton}
           onToggleCustomerInfo={() => setIsCustomerInfoOpen(true)}
         />
 
         <div className="min-h-0 flex-1 overflow-y-auto bg-[#f6f7f9]">
-          {messages.length === 0 ? (
+          {!selectedConversationId ? (
+            <div className="flex h-full items-center justify-center text-gray-500">
+              Select a conversation to view messages.
+            </div>
+          ) : loading ? (
+            <div className="flex h-full items-center justify-center text-gray-500">
+              Loading conversation...
+            </div>
+          ) : error ? (
+            <div className="flex h-full items-center justify-center text-red-600">
+              {error}
+            </div>
+          ) : messages.length === 0 ? (
             <div className="flex h-full items-center justify-center text-gray-500">
               Conversation not available yet.
             </div>
@@ -61,7 +103,11 @@ export default function ConversationPanel({
         </div>
 
         <div className="shrink-0">
-          <ReplyComposer />
+          <ReplyComposer
+            onSend={handleSend}
+            disabled={!selectedConversationId || !!conversation?.closedAt}
+            sending={sending}
+          />
         </div>
       </section>
 
@@ -81,7 +127,7 @@ export default function ConversationPanel({
               <X size={18} />
             </button>
 
-            <CustomerInfo />
+            <CustomerInfo sessionId={selectedConversationId} />
           </aside>
         </div>
       )}
