@@ -46,7 +46,7 @@ export default function LoginForm() {
       const next = searchParams.get("next");
       const isSafeNext = !!next && next.startsWith("/") && !next.startsWith("//");
       router.push(
-        isSafeNext ? next : data.user.role === "admin" ? "/admin/dashboard" : "/user/conversations"
+        isSafeNext ? next : data.user.role === "admin" ? "/admin/conversations" : "/user/conversations"
       );
     } catch {
       setError("Unable to connect to server. Please try again.");

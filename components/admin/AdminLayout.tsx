@@ -28,7 +28,7 @@ export default function AdminLayout({ title, children, noPadding = false, }: Adm
       return;
     }
     if (pathname.startsWith("/user") && u.role === "admin") {
-      router.replace("/admin/dashboard");
+      router.replace("/admin/conversations");
       return;
     }
     setUser(u);

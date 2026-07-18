@@ -46,12 +46,12 @@ export function proxy(request: NextRequest) {
   }
 
   if (isUserArea && role === "admin") {
-    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    return NextResponse.redirect(new URL("/admin/conversations", request.url));
   }
 
   if (isLoginPage && hasToken) {
     return NextResponse.redirect(
-      new URL(role === "admin" ? "/admin/dashboard" : "/user/conversations", request.url)
+      new URL(role === "admin" ? "/admin/conversations" : "/user/conversations", request.url)
     );
   }
 
