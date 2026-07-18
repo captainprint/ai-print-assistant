@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import AdminLayout from "@/components/admin/AdminLayout";
 import ConversationSidebar from "@/components/admin/conversations/ConversationSidebar";
 import CustomerInfo from "@/components/admin/conversations/CustomerInfo";
 import ConversationPanel from "@/components/admin/conversations/ConversationPanel";
 
-export default function UserConversationsPage() {
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+function UserConversationsContent() {
+  const searchParams = useSearchParams();
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(
+    () => searchParams.get("sessionId")
+  );
 
   return (
     <AdminLayout title="Conversations" noPadding>
@@ -44,5 +48,13 @@ export default function UserConversationsPage() {
         </aside>
       </div>
     </AdminLayout>
+  );
+}
+
+export default function UserConversationsPage() {
+  return (
+    <Suspense fallback={null}>
+      <UserConversationsContent />
+    </Suspense>
   );
 }

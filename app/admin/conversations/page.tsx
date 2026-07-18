@@ -1,18 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import AdminLayout from "@/components/admin/AdminLayout";
 import ConversationSidebar from "@/components/admin/conversations/ConversationSidebar";
 import ConversationPanel from "@/components/admin/conversations/ConversationPanel";
 import CustomerInfo from "@/components/admin/conversations/CustomerInfo";
 
-export default function AdminConversationsPage() {
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+function AdminConversationsContent() {
+  const searchParams = useSearchParams();
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(
+    () => searchParams.get("sessionId")
+  );
 
   return (
     <AdminLayout title="Conversations" noPadding>
       <div className="grid h-full min-h-0 overflow-hidden rounded-2xl border border-gray-200 bg-white lg:grid-cols-[380px_1fr] xl:grid-cols-[380px_1fr_280px]">
-        
+
         {/* Conversation List */}
         <div
           className={`min-h-0 overflow-hidden ${
@@ -44,5 +48,13 @@ export default function AdminConversationsPage() {
         </aside>
       </div>
     </AdminLayout>
+  );
+}
+
+export default function AdminConversationsPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminConversationsContent />
+    </Suspense>
   );
 }

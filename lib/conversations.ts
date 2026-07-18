@@ -181,6 +181,10 @@ export async function getConversation(sessionId: string): Promise<ConversationDe
   return request(`/api/v1/handoff/conversations/${sessionId}`);
 }
 
+export async function viewConversationByToken(token: string): Promise<ConversationDetail> {
+  return request(`/api/v1/handoff/view/${token}`);
+}
+
 export async function sendStaffReply(
   sessionId: string,
   message: string

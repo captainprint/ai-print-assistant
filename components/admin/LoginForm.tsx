@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Mail, Printer, Loader2 } from "lucide-react";
 import { saveAuth } from "@/lib/adminAuth";
 
@@ -9,6 +9,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -41,7 +42,12 @@ export default function LoginForm() {
       }
 
       saveAuth(data.token, data.user);
-      router.push(data.user.role === "admin" ? "/admin/dashboard" : "/user/conversations");
+
+      const next = searchParams.get("next");
+      const isSafeNext = !!next && next.startsWith("/") && !next.startsWith("//");
+      router.push(
+        isSafeNext ? next : data.user.role === "admin" ? "/admin/dashboard" : "/user/conversations"
+      );
     } catch {
       setError("Unable to connect to server. Please try again.");
     } finally {

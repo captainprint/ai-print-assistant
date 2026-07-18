@@ -9,6 +9,10 @@ const ADMIN_PATHS = [
 
 const USER_PATHS = ["/user/conversations"];
 
+// Requires any authenticated staff account (admin or user role) — the page
+// itself routes to the right area once it knows the role.
+const STAFF_PATHS = ["/handoff"];
+
 const LOGIN_PATH = "/u/login";
 
 function getRole(token: string): string | null {
@@ -28,10 +32,13 @@ export function proxy(request: NextRequest) {
 
   const isAdminArea = ADMIN_PATHS.some((p) => pathname.startsWith(p));
   const isUserArea = USER_PATHS.some((p) => pathname.startsWith(p));
+  const isStaffArea = STAFF_PATHS.some((p) => pathname.startsWith(p));
   const isLoginPage = pathname === LOGIN_PATH;
 
-  if ((isAdminArea || isUserArea) && !hasToken) {
-    return NextResponse.redirect(new URL(LOGIN_PATH, request.url));
+  if ((isAdminArea || isUserArea || isStaffArea) && !hasToken) {
+    const loginUrl = new URL(LOGIN_PATH, request.url);
+    loginUrl.searchParams.set("next", pathname + request.nextUrl.search);
+    return NextResponse.redirect(loginUrl);
   }
 
   if (isAdminArea && role !== "admin") {
@@ -52,5 +59,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/user/:path*", "/u/:path*"],
+  matcher: ["/admin/:path*", "/user/:path*", "/u/:path*", "/handoff/:path*"],
 };
