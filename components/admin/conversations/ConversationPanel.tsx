@@ -6,6 +6,7 @@ import ConversationHeader from "./ConversationHeader";
 import ConversationMessages from "./ConversationMessages";
 import ReplyComposer from "./ReplyComposer";
 import CustomerInfo from "./CustomerInfo";
+import AssignmentGate from "./AssignmentGate";
 import {
   getConversation,
   sendStaffReply,
@@ -102,13 +103,17 @@ export default function ConversationPanel({
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="shrink-0">
-          <ReplyComposer
-            onSend={handleSend}
-            disabled={!selectedConversationId || !!conversation?.closedAt}
-            sending={sending}
-          />
-        </div>
+        {selectedConversationId && conversation && !conversation.assignedTo && !conversation.closedAt ? (
+          <AssignmentGate sessionId={selectedConversationId} onAssigned={loadConversation} />
+        ) : (
+          <div className="shrink-0">
+            <ReplyComposer
+              onSend={handleSend}
+              disabled={!selectedConversationId || !!conversation?.closedAt}
+              sending={sending}
+            />
+          </div>
+        )}
       </section>
 
       {isCustomerInfoOpen && (
