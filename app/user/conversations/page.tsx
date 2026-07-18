@@ -12,6 +12,8 @@ function UserConversationsContent() {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(
     () => searchParams.get("sessionId")
   );
+  const [refreshSignal, setRefreshSignal] = useState(0);
+  const handleConversationChanged = () => setRefreshSignal((v) => v + 1);
 
   return (
     <AdminLayout title="Conversations" noPadding>
@@ -26,6 +28,7 @@ function UserConversationsContent() {
           <ConversationSidebar
             selectedConversationId={selectedConversationId}
             onSelectConversation={(id) => setSelectedConversationId(id)}
+            refreshSignal={refreshSignal}
           />
         </div>
 
@@ -39,12 +42,18 @@ function UserConversationsContent() {
             selectedConversationId={selectedConversationId}
             onBack={() => setSelectedConversationId(null)}
             showBackButton={!!selectedConversationId}
+            refreshSignal={refreshSignal}
+            onConversationChanged={handleConversationChanged}
           />
         </div>
 
         {/* Customer Info - Desktop Only */}
         <aside className="hidden min-h-0 overflow-hidden border-l border-gray-200 bg-white xl:block">
-          <CustomerInfo sessionId={selectedConversationId} />
+          <CustomerInfo
+            sessionId={selectedConversationId}
+            refreshSignal={refreshSignal}
+            onConversationChanged={handleConversationChanged}
+          />
         </aside>
       </div>
     </AdminLayout>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Mail,
   Phone,
@@ -17,15 +17,18 @@ import {
   closeConversation,
   deriveStatus,
   initialsFromName,
+  ApiError,
   type ConversationDetail,
   type AssignableUser,
 } from "@/lib/conversations";
 
 type CustomerInfoProps = {
   sessionId?: string | null;
+  refreshSignal?: number;
+  onConversationChanged?: () => void;
 };
 
-export default function CustomerInfo({ sessionId }: CustomerInfoProps) {
+export default function CustomerInfo({ sessionId, refreshSignal, onConversationChanged }: CustomerInfoProps) {
   const [conversation, setConversation] = useState<ConversationDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<AssignableUser[]>([]);
@@ -34,23 +37,52 @@ export default function CustomerInfo({ sessionId }: CustomerInfoProps) {
   const [assignmentSearch, setAssignmentSearch] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [accessRevoked, setAccessRevoked] = useState(false);
 
-  function loadConversation() {
+  function loadConversation(silent = false) {
     if (!sessionId) {
       setConversation(null);
       return;
     }
-    setLoading(true);
+    if (!silent) setLoading(true);
     getConversation(sessionId)
-      .then(setConversation)
-      .catch(() => setConversation(null))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        setConversation(data);
+        setAccessRevoked(false);
+      })
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 403) {
+          // Reassigned/closed elsewhere and no longer visible to this staff
+          // member — keep the last-known content, just lock the controls
+          // down. It'll drop off the list on the next real reload.
+          setAccessRevoked(true);
+          return;
+        }
+        if (!silent) setConversation(null);
+      })
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
   }
 
   useEffect(() => {
+    setAccessRevoked(false);
     loadConversation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
+
+  // Silent background refresh (e.g. after an assignment/status change
+  // triggered from a sibling panel) — no loading flash.
+  const isFirstRefresh = useRef(true);
+  useEffect(() => {
+    if (isFirstRefresh.current) {
+      isFirstRefresh.current = false;
+      return;
+    }
+    if (refreshSignal === undefined) return;
+    loadConversation(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshSignal]);
 
   useEffect(() => {
     listAssignableUsers()
@@ -68,7 +100,8 @@ export default function CustomerInfo({ sessionId }: CustomerInfoProps) {
     setActionError(null);
     try {
       await assignConversation(sessionId, userId);
-      loadConversation();
+      loadConversation(true);
+      onConversationChanged?.();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to assign conversation");
     } finally {
@@ -82,7 +115,8 @@ export default function CustomerInfo({ sessionId }: CustomerInfoProps) {
     setActionError(null);
     try {
       await unassignConversation(sessionId);
-      loadConversation();
+      loadConversation(true);
+      onConversationChanged?.();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to unassign conversation");
     } finally {
@@ -96,7 +130,8 @@ export default function CustomerInfo({ sessionId }: CustomerInfoProps) {
     setActionError(null);
     try {
       await closeConversation(sessionId);
-      loadConversation();
+      loadConversation(true);
+      onConversationChanged?.();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Failed to close conversation");
     } finally {
@@ -122,6 +157,7 @@ export default function CustomerInfo({ sessionId }: CustomerInfoProps) {
   const name = conversation?.customerProfile?.name;
   const status = conversation ? deriveStatus(conversation) : "New";
   const isClosed = !!conversation?.closedAt;
+  const isLocked = isClosed || accessRevoked;
 
   return (
     <aside className="flex h-full min-h-0 flex-col bg-white">
@@ -182,6 +218,8 @@ export default function CustomerInfo({ sessionId }: CustomerInfoProps) {
               <p className="mt-1 text-xs text-gray-500">
                 {isClosed
                   ? "This conversation has been resolved."
+                  : accessRevoked
+                  ? "This conversation was updated elsewhere. Reload the page to refresh your list."
                   : "Close this conversation once the customer's request is handled."}
               </p>
 
@@ -189,7 +227,7 @@ export default function CustomerInfo({ sessionId }: CustomerInfoProps) {
                 <button
                   type="button"
                   onClick={handleClose}
-                  disabled={actionLoading}
+                  disabled={actionLoading || accessRevoked}
                   className="mt-4 h-10 w-full rounded-lg bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Close Conversation
@@ -214,7 +252,7 @@ export default function CustomerInfo({ sessionId }: CustomerInfoProps) {
                     setIsAssignmentOpen(!isAssignmentOpen);
                     setAssignmentSearch("");
                   }}
-                  disabled={isClosed}
+                  disabled={isLocked}
                   className="flex h-11 w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-3 text-left transition hover:border-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <div className="flex min-w-0 items-center gap-3">
@@ -299,7 +337,7 @@ export default function CustomerInfo({ sessionId }: CustomerInfoProps) {
                 <button
                   type="button"
                   onClick={handleUnassign}
-                  disabled={actionLoading}
+                  disabled={actionLoading || accessRevoked}
                   className="mt-3 h-10 w-full rounded-lg border border-gray-200 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Unassign

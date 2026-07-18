@@ -11,6 +11,7 @@ import {
   getConversation,
   sendStaffReply,
   mergeMessages,
+  ApiError,
   type ConversationDetail,
 } from "@/lib/conversations";
 
@@ -18,40 +19,75 @@ type ConversationPanelProps = {
   selectedConversationId?: string | null;
   onBack?: () => void;
   showBackButton?: boolean;
+  refreshSignal?: number;
+  onConversationChanged?: () => void;
 };
 
 export default function ConversationPanel({
   selectedConversationId,
   onBack,
   showBackButton = false,
+  refreshSignal,
+  onConversationChanged,
 }: ConversationPanelProps) {
   const [isCustomerInfoOpen, setIsCustomerInfoOpen] = useState(false);
   const [conversation, setConversation] = useState<ConversationDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  const [accessRevoked, setAccessRevoked] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const loadConversation = useCallback(() => {
+  const loadConversation = useCallback((silent = false) => {
     if (!selectedConversationId) {
       setConversation(null);
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    if (!silent) {
+      setLoading(true);
+      setError(null);
+      setAccessRevoked(false);
+    }
 
     getConversation(selectedConversationId)
-      .then(setConversation)
-      .catch((err) => {
-        setError(err instanceof Error ? err.message : "Failed to load conversation");
+      .then((data) => {
+        setConversation(data);
+        setAccessRevoked(false);
       })
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 403) {
+          // Reassigned/closed elsewhere and no longer visible to this staff
+          // member — keep the last-known content, just lock interaction
+          // down. It'll drop off the list on the next real reload.
+          setAccessRevoked(true);
+          return;
+        }
+        if (!silent) {
+          setError(err instanceof Error ? err.message : "Failed to load conversation");
+        }
+      })
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
   }, [selectedConversationId]);
 
   useEffect(() => {
     loadConversation();
   }, [loadConversation]);
+
+  // Silent background refresh (e.g. after an assignment/status change
+  // elsewhere) — updates the conversation without showing a loading state.
+  const isFirstRefresh = useRef(true);
+  useEffect(() => {
+    if (isFirstRefresh.current) {
+      isFirstRefresh.current = false;
+      return;
+    }
+    if (refreshSignal === undefined) return;
+    loadConversation(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshSignal]);
 
   const messages = conversation ? mergeMessages(conversation) : [];
 
@@ -103,13 +139,24 @@ export default function ConversationPanel({
           <div ref={messagesEndRef} />
         </div>
 
-        {selectedConversationId && conversation && !conversation.assignedTo && !conversation.closedAt ? (
-          <AssignmentGate sessionId={selectedConversationId} onAssigned={loadConversation} />
+        {selectedConversationId && conversation && !accessRevoked && !conversation.assignedTo && !conversation.closedAt ? (
+          <AssignmentGate
+            sessionId={selectedConversationId}
+            onAssigned={() => {
+              loadConversation(true);
+              onConversationChanged?.();
+            }}
+          />
         ) : (
           <div className="shrink-0">
             <ReplyComposer
               onSend={handleSend}
-              disabled={!selectedConversationId || !!conversation?.closedAt}
+              disabled={!selectedConversationId || accessRevoked || !!conversation?.closedAt}
+              disabledMessage={
+                accessRevoked
+                  ? "This conversation is assigned to someone in your team — reload to refresh your list."
+                  : undefined
+              }
               sending={sending}
             />
           </div>
@@ -132,7 +179,11 @@ export default function ConversationPanel({
               <X size={18} />
             </button>
 
-            <CustomerInfo sessionId={selectedConversationId} />
+            <CustomerInfo
+              sessionId={selectedConversationId}
+              refreshSignal={refreshSignal}
+              onConversationChanged={onConversationChanged}
+            />
           </aside>
         </div>
       )}

@@ -6,10 +6,11 @@ import { Send } from "lucide-react";
 type ReplyComposerProps = {
   onSend: (message: string) => Promise<void>;
   disabled?: boolean;
+  disabledMessage?: string;
   sending?: boolean;
 };
 
-export default function ReplyComposer({ onSend, disabled, sending }: ReplyComposerProps) {
+export default function ReplyComposer({ onSend, disabled, disabledMessage, sending }: ReplyComposerProps) {
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +41,9 @@ export default function ReplyComposer({ onSend, disabled, sending }: ReplyCompos
           }}
           disabled={disabled}
           placeholder={
-            disabled ? "This conversation is closed." : "Type your reply to the customer..."
+            disabled
+              ? disabledMessage || ""
+              : "Type your reply to the customer..."
           }
           className="min-h-[90px] w-full resize-none px-5 py-4 text-sm text-gray-900 outline-none disabled:bg-gray-50 disabled:text-gray-400"
         />
