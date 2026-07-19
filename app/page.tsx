@@ -14,7 +14,10 @@ import {
   sendCustomerReply,
   mergeConversationMessages,
 } from "@/lib/chat";
+import { usePolling } from "@/lib/usePolling";
 import type { Message } from "@/types/message";
+
+const POLL_INTERVAL_MS = 6000;
 
 function getCurrentTime() {
   return new Date().toLocaleTimeString([], {
@@ -205,6 +208,33 @@ function HomeContent() {
       setIsAiTyping(false);
     }
   }
+
+  // Poll while resuming via a magic-link token — a reply can arrive from
+  // staff at any point without any action on the customer's end.
+  usePolling(() => {
+    if (!resumeToken || isResuming || resumeError || sendingReply || resumeStatus === "completed") return;
+    resumeConversation(resumeToken)
+      .then((conversation) => {
+        setResumeStatus(conversation.status);
+        setMessages(mergeConversationMessages(conversation));
+      })
+      .catch(() => {});
+  }, POLL_INTERVAL_MS);
+
+  // Poll the anonymous session once it's been escalated — same reasoning,
+  // but only once there's a human involved; the AI itself always answers
+  // synchronously so there's nothing to poll for before that.
+  usePolling(() => {
+    if (resumeToken || !sessionId || !isHumanRequired || sendingHumanReply) return;
+    getSession(sessionId)
+      .then((session) => {
+        if (!session) return;
+        setMessages(mergeConversationMessages(session));
+        setIsHumanRequired(session.status === "human_required");
+        setHasStaffReplied(session.staffReplies.length > 0);
+      })
+      .catch(() => {});
+  }, POLL_INTERVAL_MS);
 
   // Once a staff member has replied, the customer keeps talking to them, not
   // the bot — before that first reply, there's nothing to hand the message

@@ -6,6 +6,9 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import ConversationSidebar from "@/components/admin/conversations/ConversationSidebar";
 import ConversationPanel from "@/components/admin/conversations/ConversationPanel";
 import CustomerInfo from "@/components/admin/conversations/CustomerInfo";
+import { usePolling } from "@/lib/usePolling";
+
+const POLL_INTERVAL_MS = 6000;
 
 function AdminConversationsContent() {
   const searchParams = useSearchParams();
@@ -14,6 +17,10 @@ function AdminConversationsContent() {
   );
   const [refreshSignal, setRefreshSignal] = useState(0);
   const handleConversationChanged = () => setRefreshSignal((v) => v + 1);
+
+  // Poll so the list, chat panel, and customer info pick up new messages
+  // and assignment/status changes without a manual refresh.
+  usePolling(handleConversationChanged, POLL_INTERVAL_MS);
 
   return (
     <AdminLayout title="Conversations" noPadding>
