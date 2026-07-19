@@ -9,6 +9,7 @@ import {
   getOrCreateSessionId,
   getSession,
   sendMessage,
+  sendCustomerReplyBySession,
   resumeConversation,
   sendCustomerReply,
   mergeConversationMessages,
@@ -41,6 +42,8 @@ function HomeContent() {
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isHumanRequired, setIsHumanRequired] = useState(false);
+  const [hasStaffReplied, setHasStaffReplied] = useState(false);
+  const [sendingHumanReply, setSendingHumanReply] = useState(false);
   const [messages, setMessages] = useState<Message[]>(() =>
     resumeToken ? [] : [GREETING]
   );
@@ -83,6 +86,7 @@ function HomeContent() {
       if (session && session.messages.length > 0) {
         setMessages(mergeConversationMessages(session));
         setIsHumanRequired(session.status === "human_required");
+        setHasStaffReplied(session.staffReplies.length > 0);
       }
 
       setSessionId(id);
@@ -121,6 +125,40 @@ function HomeContent() {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setSendingReply(false);
+    }
+  }
+
+  async function handleHumanReply(message: string) {
+    if (!sessionId || sendingHumanReply) return;
+
+    const userMessage: Message = {
+      role: "user",
+      message,
+      time: getCurrentTime(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setSendingHumanReply(true);
+
+    try {
+      await sendCustomerReplyBySession(sessionId, message);
+      const refreshed = await getSession(sessionId);
+      if (refreshed) {
+        setMessages(mergeConversationMessages(refreshed));
+        setIsHumanRequired(refreshed.status === "human_required");
+        setHasStaffReplied(refreshed.staffReplies.length > 0);
+      }
+    } catch (err) {
+      const errorMessage: Message = {
+        role: "ai",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Failed to send. Please try again.",
+        time: getCurrentTime(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setSendingHumanReply(false);
     }
   }
 
@@ -168,7 +206,16 @@ function HomeContent() {
     }
   }
 
-  const handleSendMessage = resumeToken ? handleResumedReply : handleAiMessage;
+  // Once a staff member has replied, the customer keeps talking to them, not
+  // the bot — before that first reply, there's nothing to hand the message
+  // to yet, so the input stays disabled with a "we'll follow up" notice.
+  const waitingForFirstReply = isHumanRequired && !hasStaffReplied;
+
+  const handleSendMessage = resumeToken
+    ? handleResumedReply
+    : isHumanRequired && hasStaffReplied
+    ? handleHumanReply
+    : handleAiMessage;
 
   if (resumeToken && resumeError) {
     return (
@@ -198,8 +245,10 @@ function HomeContent() {
       <ChatArea messages={messages} onSuggestionClick={handleSendMessage} />
       <ChatInput
         onSendMessage={handleSendMessage}
-        isAiTyping={resumeToken ? sendingReply : isAiTyping}
-        disabled={resumeToken ? resumeStatus === "completed" : isHumanRequired}
+        isAiTyping={
+          resumeToken ? sendingReply : hasStaffReplied ? sendingHumanReply : isAiTyping
+        }
+        disabled={resumeToken ? resumeStatus === "completed" : waitingForFirstReply}
         disabledReason={
           resumeToken
             ? "This conversation has been resolved."

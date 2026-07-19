@@ -104,6 +104,19 @@ export async function sendMessage(sessionId: string, message: string): Promise<S
   });
 }
 
+// Once a session has been escalated, further messages go to a human, not
+// the AI — routed by sessionId (the same public capability the rest of this
+// anonymous flow already relies on), no magic-link token required.
+export async function sendCustomerReplyBySession(
+  sessionId: string,
+  message: string
+): Promise<{ success: boolean; message: string }> {
+  return request(`/api/v1/handoff/customer-reply-by-session/${sessionId}`, {
+    method: "POST",
+    body: JSON.stringify({ message }),
+  });
+}
+
 // --- Resuming a handed-off conversation via a customer magic-link token ---
 // This is a separate flow from the anonymous AI session above: once a staff
 // member has replied, the conversation continues with a human, not the bot.
