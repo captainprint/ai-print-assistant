@@ -95,8 +95,10 @@ export default function ConversationPanel({
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
   }, [selectedConversationId, messages.length]);
 
+  const notYetHuman = conversation?.status === "active";
+
   async function handleSend(message: string) {
-    if (!selectedConversationId) return;
+    if (!selectedConversationId || notYetHuman) return;
     setSending(true);
     try {
       await sendStaffReply(selectedConversationId, message);
@@ -139,7 +141,7 @@ export default function ConversationPanel({
           <div ref={messagesEndRef} />
         </div>
 
-        {selectedConversationId && conversation && !accessRevoked && !conversation.assignedTo && !conversation.closedAt ? (
+        {selectedConversationId && conversation && !accessRevoked && !notYetHuman && !conversation.assignedTo && !conversation.closedAt ? (
           <AssignmentGate
             sessionId={selectedConversationId}
             onAssigned={() => {
@@ -151,10 +153,12 @@ export default function ConversationPanel({
           <div className="shrink-0">
             <ReplyComposer
               onSend={handleSend}
-              disabled={!selectedConversationId || accessRevoked || !!conversation?.closedAt}
+              disabled={!selectedConversationId || accessRevoked || !!conversation?.closedAt || notYetHuman}
               disabledMessage={
                 accessRevoked
                   ? "This conversation is assigned to someone in your team — reload to refresh your list."
+                  : notYetHuman
+                  ? "The AI is still assisting this customer — you can reply once they ask for a human."
                   : undefined
               }
               sending={sending}

@@ -157,7 +157,8 @@ export default function CustomerInfo({ sessionId, refreshSignal, onConversationC
   const name = conversation?.customerProfile?.name;
   const status = conversation ? deriveStatus(conversation) : "New";
   const isClosed = !!conversation?.closedAt;
-  const isLocked = isClosed || accessRevoked;
+  const notYetHuman = conversation?.status === "active";
+  const isLocked = isClosed || accessRevoked || notYetHuman;
 
   return (
     <aside className="flex h-full min-h-0 flex-col bg-white">
@@ -242,7 +243,9 @@ export default function CustomerInfo({ sessionId, refreshSignal, onConversationC
               </p>
 
               <p className="mt-1 text-xs text-gray-500">
-                Assign this conversation to a team member.
+                {notYetHuman
+                  ? "The AI is still assisting this customer — assignment unlocks once they ask for a human."
+                  : "Assign this conversation to a team member."}
               </p>
 
               <div className="relative mt-4">
@@ -337,7 +340,7 @@ export default function CustomerInfo({ sessionId, refreshSignal, onConversationC
                 <button
                   type="button"
                   onClick={handleUnassign}
-                  disabled={actionLoading || accessRevoked}
+                  disabled={actionLoading || accessRevoked || notYetHuman}
                   className="mt-3 h-10 w-full rounded-lg border border-gray-200 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Unassign
