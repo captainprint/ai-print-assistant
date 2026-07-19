@@ -102,7 +102,7 @@ export default function ConversationPanel({
     setSending(true);
     try {
       await sendStaffReply(selectedConversationId, message);
-      loadConversation();
+      loadConversation(true);
     } finally {
       setSending(false);
     }

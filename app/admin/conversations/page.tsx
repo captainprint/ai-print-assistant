@@ -8,7 +8,7 @@ import ConversationPanel from "@/components/admin/conversations/ConversationPane
 import CustomerInfo from "@/components/admin/conversations/CustomerInfo";
 import { usePolling } from "@/lib/usePolling";
 
-const POLL_INTERVAL_MS = 6000;
+const POLL_INTERVAL_MS = 10000;
 
 function AdminConversationsContent() {
   const searchParams = useSearchParams();
