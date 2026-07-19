@@ -11,19 +11,12 @@ import {
   sendMessage,
   resumeConversation,
   sendCustomerReply,
-  mergeResumedMessages,
+  mergeConversationMessages,
 } from "@/lib/chat";
 import type { Message } from "@/types/message";
 
 function getCurrentTime() {
   return new Date().toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-function formatTimestamp(timestamp: string) {
-  return new Date(timestamp).toLocaleTimeString([], {
     hour: "numeric",
     minute: "2-digit",
   });
@@ -68,7 +61,7 @@ function HomeContent() {
           const conversation = await resumeConversation(resumeToken);
           if (cancelled) return;
           setResumeStatus(conversation.status);
-          setMessages(mergeResumedMessages(conversation));
+          setMessages(mergeConversationMessages(conversation));
         } catch (err) {
           if (cancelled) return;
           setResumeError(
@@ -88,14 +81,7 @@ function HomeContent() {
       if (cancelled) return;
 
       if (session && session.messages.length > 0) {
-        const hydrated: Message[] = session.messages
-          .filter((m) => m.role !== "system")
-          .map((m) => ({
-            role: m.role === "user" ? "user" : "ai",
-            message: m.content,
-            time: formatTimestamp(m.timestamp),
-          }));
-        setMessages(hydrated);
+        setMessages(mergeConversationMessages(session));
         setIsHumanRequired(session.status === "human_required");
       }
 
@@ -122,7 +108,7 @@ function HomeContent() {
       await sendCustomerReply(resumeToken, message);
       const refreshed = await resumeConversation(resumeToken);
       setResumeStatus(refreshed.status);
-      setMessages(mergeResumedMessages(refreshed));
+      setMessages(mergeConversationMessages(refreshed));
     } catch (err) {
       const errorMessage: Message = {
         role: "ai",

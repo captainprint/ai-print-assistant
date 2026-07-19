@@ -37,12 +37,19 @@ export type SendMessageResponse = {
 };
 
 type RawSessionMessage = { role: "user" | "assistant" | "system"; content: string; timestamp: string };
+type RawStaffReply = { message: string; staffName: string; timestamp: string };
+type RawCustomerReply = { message: string; timestamp: string };
 
 export type SessionState = {
   sessionId: string;
   status: "active" | "completed" | "human_required";
   stage: string;
   messages: RawSessionMessage[];
+  // The backend returns the full session document — these are present even
+  // though the anonymous chat flow didn't used to read them (see
+  // mergeConversationMessages below).
+  staffReplies: RawStaffReply[];
+  customerReplies: RawCustomerReply[];
 };
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -107,9 +114,6 @@ type CustomerProfile = {
   phone?: string | null;
 };
 
-type RawStaffReply = { message: string; staffName: string; timestamp: string };
-type RawCustomerReply = { message: string; timestamp: string };
-
 export type ResumedConversation = {
   sessionId: string;
   status: "active" | "completed" | "human_required";
@@ -138,7 +142,19 @@ function formatTime(timestamp: string): string {
   return new Date(timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
-export function mergeResumedMessages(conversation: ResumedConversation): Message[] {
+type MergeableConversation = {
+  messages: RawSessionMessage[];
+  staffReplies: RawStaffReply[];
+  customerReplies: RawCustomerReply[];
+};
+
+/**
+ * Merges the AI-only messages with any staff/customer handoff replies into
+ * one time-sorted list. Used both when resuming via a magic-link token and
+ * when a returning visitor's own browser still has the session locally —
+ * either way, a staff reply must be visible once it's happened.
+ */
+export function mergeConversationMessages(conversation: MergeableConversation): Message[] {
   type Timed = { role: "ai" | "user"; message: string; timestamp: string; senderName?: string };
 
   const fromMessages: Timed[] = conversation.messages
