@@ -17,7 +17,7 @@ import {
 import { usePolling } from "@/lib/usePolling";
 import type { Message } from "@/types/message";
 
-const POLL_INTERVAL_MS = 6000;
+const POLL_INTERVAL_MS = 10000;
 
 function getCurrentTime() {
   return new Date().toLocaleTimeString([], {
