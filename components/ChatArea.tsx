@@ -62,6 +62,7 @@ export default function ChatArea({
             isTyping={message.isTyping}
             recommendations={message.recommendations}
             images={message.images}
+            senderName={message.senderName}
           />
         ))}
 

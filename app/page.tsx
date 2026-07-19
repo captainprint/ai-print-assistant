@@ -1,10 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import ChatArea from "@/components/ChatArea";
 import ChatInput from "@/components/ChatInput";
-import { getOrCreateSessionId, getSession, sendMessage } from "@/lib/chat";
+import {
+  getOrCreateSessionId,
+  getSession,
+  sendMessage,
+  resumeConversation,
+  sendCustomerReply,
+  mergeResumedMessages,
+} from "@/lib/chat";
 import type { Message } from "@/types/message";
 
 function getCurrentTime() {
@@ -33,16 +41,47 @@ const GREETING: Message = {
   ],
 };
 
-export default function Home() {
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const resumeToken = searchParams.get("t");
+
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isHumanRequired, setIsHumanRequired] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([GREETING]);
+  const [messages, setMessages] = useState<Message[]>(() =>
+    resumeToken ? [] : [GREETING]
+  );
+
+  const [isResuming, setIsResuming] = useState(!!resumeToken);
+  const [resumeStatus, setResumeStatus] = useState<
+    "active" | "completed" | "human_required" | null
+  >(null);
+  const [resumeError, setResumeError] = useState<string | null>(null);
+  const [sendingReply, setSendingReply] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
     (async () => {
+      if (resumeToken) {
+        try {
+          const conversation = await resumeConversation(resumeToken);
+          if (cancelled) return;
+          setResumeStatus(conversation.status);
+          setMessages(mergeResumedMessages(conversation));
+        } catch (err) {
+          if (cancelled) return;
+          setResumeError(
+            err instanceof Error
+              ? err.message
+              : "Unable to load this conversation."
+          );
+        } finally {
+          if (!cancelled) setIsResuming(false);
+        }
+        return;
+      }
+
       const id = await getOrCreateSessionId();
       const session = await getSession(id);
 
@@ -66,9 +105,40 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [resumeToken]);
 
-  async function handleSendMessage(message: string) {
+  async function handleResumedReply(message: string) {
+    if (!resumeToken || sendingReply || resumeStatus === "completed") return;
+
+    const userMessage: Message = {
+      role: "user",
+      message,
+      time: getCurrentTime(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setSendingReply(true);
+
+    try {
+      await sendCustomerReply(resumeToken, message);
+      const refreshed = await resumeConversation(resumeToken);
+      setResumeStatus(refreshed.status);
+      setMessages(mergeResumedMessages(refreshed));
+    } catch (err) {
+      const errorMessage: Message = {
+        role: "ai",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Failed to send. Please try again.",
+        time: getCurrentTime(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setSendingReply(false);
+    }
+  }
+
+  async function handleAiMessage(message: string) {
     if (!sessionId || isAiTyping || isHumanRequired) return;
 
     const userMessage: Message = {
@@ -112,16 +182,52 @@ export default function Home() {
     }
   }
 
+  const handleSendMessage = resumeToken ? handleResumedReply : handleAiMessage;
+
+  if (resumeToken && resumeError) {
+    return (
+      <main className="h-screen flex flex-col bg-[#f6f7f9] overflow-hidden">
+        <Header />
+        <div className="flex-1 flex items-center justify-center px-8 text-center">
+          <p className="text-gray-600">{resumeError}</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (resumeToken && isResuming) {
+    return (
+      <main className="h-screen flex flex-col bg-[#f6f7f9] overflow-hidden">
+        <Header />
+        <div className="flex-1 flex items-center justify-center px-8 text-center text-gray-500">
+          Loading your conversation...
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="h-screen flex flex-col bg-[#f6f7f9] overflow-hidden">
       <Header />
       <ChatArea messages={messages} onSuggestionClick={handleSendMessage} />
       <ChatInput
         onSendMessage={handleSendMessage}
-        isAiTyping={isAiTyping}
-        disabled={isHumanRequired}
-        disabledReason="Our team will be in touch by email shortly."
+        isAiTyping={resumeToken ? sendingReply : isAiTyping}
+        disabled={resumeToken ? resumeStatus === "completed" : isHumanRequired}
+        disabledReason={
+          resumeToken
+            ? "This conversation has been resolved."
+            : "Our team will be in touch by email shortly."
+        }
       />
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   );
 }

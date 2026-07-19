@@ -1,3 +1,7 @@
+import type { Message } from "@/types/message";
+// (type-only import — types/message.ts imports back from here, also type-only,
+// so this doesn't create a runtime circular dependency.)
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 
 const SESSION_KEY = "chat_session_id";
@@ -91,4 +95,79 @@ export async function sendMessage(sessionId: string, message: string): Promise<S
     method: "POST",
     body: JSON.stringify({ sessionId, message }),
   });
+}
+
+// --- Resuming a handed-off conversation via a customer magic-link token ---
+// This is a separate flow from the anonymous AI session above: once a staff
+// member has replied, the conversation continues with a human, not the bot.
+
+type CustomerProfile = {
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+};
+
+type RawStaffReply = { message: string; staffName: string; timestamp: string };
+type RawCustomerReply = { message: string; timestamp: string };
+
+export type ResumedConversation = {
+  sessionId: string;
+  status: "active" | "completed" | "human_required";
+  customerProfile: CustomerProfile;
+  messages: RawSessionMessage[];
+  staffReplies: RawStaffReply[];
+  customerReplies: RawCustomerReply[];
+  customerToken: string;
+};
+
+export async function resumeConversation(token: string): Promise<ResumedConversation> {
+  return request<ResumedConversation>(`/api/v1/handoff/resume/${token}`);
+}
+
+export async function sendCustomerReply(
+  token: string,
+  message: string
+): Promise<{ success: boolean; message: string }> {
+  return request(`/api/v1/handoff/customer-reply/${token}`, {
+    method: "POST",
+    body: JSON.stringify({ message }),
+  });
+}
+
+function formatTime(timestamp: string): string {
+  return new Date(timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+export function mergeResumedMessages(conversation: ResumedConversation): Message[] {
+  type Timed = { role: "ai" | "user"; message: string; timestamp: string; senderName?: string };
+
+  const fromMessages: Timed[] = conversation.messages
+    .filter((m) => m.role !== "system")
+    .map((m) => ({
+      role: m.role === "user" ? "user" : "ai",
+      message: m.content,
+      timestamp: m.timestamp,
+    }));
+
+  const fromStaff: Timed[] = conversation.staffReplies.map((r) => ({
+    role: "ai",
+    message: r.message,
+    timestamp: r.timestamp,
+    senderName: r.staffName,
+  }));
+
+  const fromCustomer: Timed[] = conversation.customerReplies.map((r) => ({
+    role: "user",
+    message: r.message,
+    timestamp: r.timestamp,
+  }));
+
+  return [...fromMessages, ...fromStaff, ...fromCustomer]
+    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+    .map(({ role, message, timestamp, senderName }) => ({
+      role,
+      message,
+      time: formatTime(timestamp),
+      senderName,
+    }));
 }

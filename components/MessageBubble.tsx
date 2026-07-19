@@ -9,7 +9,18 @@ type Props = {
   isTyping?: boolean;
   recommendations?: ChatRecommendation[];
   images?: MatchedImageGroup[];
+  senderName?: string;
 };
+
+function initials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 export default function MessageBubble({
   role,
@@ -18,15 +29,20 @@ export default function MessageBubble({
   isTyping,
   recommendations,
   images,
+  senderName,
 }: Props) {
   if (role === "ai") {
     return (
       <div className="flex items-start gap-3">
         <div className="w-9 h-9 rounded-full bg-[#3157F6] text-white flex items-center justify-center text-sm font-semibold shrink-0">
-          AI
+          {senderName ? initials(senderName) : "AI"}
         </div>
 
         <div className="max-w-[420px] rounded-xl bg-white border border-gray-200 px-5 py-4 shadow-sm">
+          {senderName && !isTyping && (
+            <p className="text-xs font-semibold text-gray-500 mb-1">{senderName}</p>
+          )}
+
           {isTyping ? (
             <div className="flex items-center gap-1 py-1">
               <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" />
