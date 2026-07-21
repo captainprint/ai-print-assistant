@@ -81,7 +81,7 @@ export default function Header({ onCloseTicket }: HeaderProps) {
             </h3>
 
             <p className="mt-2 text-sm text-gray-500">
-              You&apos;ll start a brand new chat next time you open the assistant.
+              Your current conversation will be closed, and a new conversation will be started. Do you want to continue?
             </p>
 
             <div className="mt-6 flex justify-end gap-3">
@@ -90,7 +90,7 @@ export default function Header({ onCloseTicket }: HeaderProps) {
                 onClick={() => setIsConfirmOpen(false)}
                 className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
               >
-                Cancel
+                No
               </button>
 
               <button
@@ -101,7 +101,7 @@ export default function Header({ onCloseTicket }: HeaderProps) {
                 }}
                 className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 cursor-pointer"
               >
-                End
+                Yes
               </button>
             </div>
           </div>
