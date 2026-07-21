@@ -13,6 +13,8 @@ import {
   resumeConversation,
   sendCustomerReply,
   mergeConversationMessages,
+  closeSession,
+  clearLocalSession,
 } from "@/lib/chat";
 import { usePolling } from "@/lib/usePolling";
 import type { Message } from "@/types/message";
@@ -55,6 +57,7 @@ function HomeContent() {
   const [resumeStatus, setResumeStatus] = useState<
     "active" | "completed" | "human_required" | null
   >(null);
+  const [resumeSessionId, setResumeSessionId] = useState<string | null>(null);
   const [resumeError, setResumeError] = useState<string | null>(null);
   const [sendingReply, setSendingReply] = useState(false);
 
@@ -67,6 +70,7 @@ function HomeContent() {
           const conversation = await resumeConversation(resumeToken);
           if (cancelled) return;
           setResumeStatus(conversation.status);
+          setResumeSessionId(conversation.sessionId);
           setMessages(mergeConversationMessages(conversation));
         } catch (err) {
           if (cancelled) return;
@@ -165,6 +169,28 @@ function HomeContent() {
     }
   }
 
+  async function handleCloseTicket() {
+    const idToClose = resumeToken ? resumeSessionId : sessionId;
+    if (!idToClose) return;
+
+    try {
+      await closeSession(idToClose);
+    } catch {
+      // best-effort — still reset the customer's local view even if this
+      // fails; a fresh session gets created on their next message either way
+    }
+
+    if (resumeToken) {
+      setResumeStatus("completed");
+    } else {
+      clearLocalSession();
+      setMessages([GREETING]);
+      setIsHumanRequired(false);
+      setHasStaffReplied(false);
+      setSessionId(await getOrCreateSessionId());
+    }
+  }
+
   async function handleAiMessage(message: string) {
     if (!sessionId || isAiTyping || isHumanRequired) return;
 
@@ -241,6 +267,11 @@ function HomeContent() {
   // to yet, so the input stays disabled with a "we'll follow up" notice.
   const waitingForFirstReply = isHumanRequired && !hasStaffReplied;
 
+  // Menu only makes sense once there's an actual conversation to close —
+  // a session exists from the moment the widget loads, before the customer
+  // has said anything.
+  const hasCustomerMessage = messages.some((m) => m.role === "user");
+
   const handleSendMessage = resumeToken
     ? handleResumedReply
     : isHumanRequired && hasStaffReplied
@@ -271,7 +302,7 @@ function HomeContent() {
 
   return (
     <main className="h-screen flex flex-col bg-[#f6f7f9] overflow-hidden">
-      <Header />
+      <Header onCloseTicket={hasCustomerMessage ? handleCloseTicket : undefined} />
       <ChatArea messages={messages} onSuggestionClick={handleSendMessage} />
       <ChatInput
         onSendMessage={handleSendMessage}

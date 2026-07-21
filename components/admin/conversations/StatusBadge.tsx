@@ -7,8 +7,8 @@ export default function StatusBadge({
 }: StatusBadgeProps) {
   const styles = {
     New: "bg-blue-100 text-blue-700",
-    Open: "bg-green-100 text-green-700",
-    Resolved: "bg-gray-100 text-gray-600",
+    Open: "bg-red-100 text-red-700",
+    Resolved: "bg-green-100 text-green-700",
   };
 
   return (

@@ -97,6 +97,14 @@ export async function getOrCreateSessionId(): Promise<string> {
   return sessionId;
 }
 
+export async function closeSession(sessionId: string): Promise<{ success: boolean; closedAt: string }> {
+  return request(`/api/v1/chat/session/${sessionId}/close`, { method: "POST" });
+}
+
+export function clearLocalSession(): void {
+  if (typeof window !== "undefined") window.localStorage.removeItem(SESSION_KEY);
+}
+
 export async function sendMessage(sessionId: string, message: string): Promise<SendMessageResponse> {
   return request<SendMessageResponse>("/api/v1/chat/message", {
     method: "POST",
