@@ -11,7 +11,7 @@ type Props = {
 
 export default function RecommendationCards({ recommendations, images }: Props) {
   return (
-    <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
+    <div className="mt-3 flex w-full min-w-0 max-w-full gap-3 overflow-x-auto overflow-y-hidden pb-2">
       {recommendations.map((rec, i) => (
         <RecommendationCard key={`${rec.productType}-${i}`} recommendation={rec} images={images[i]?.images ?? []} />
       ))}

@@ -33,12 +33,12 @@ export default function MessageBubble({
 }: Props) {
   if (role === "ai") {
     return (
-      <div className="flex items-start gap-3">
+      <div className="flex min-w-0 max-w-full items-start gap-3">
         <div className="w-9 h-9 rounded-full bg-[#3157F6] text-white flex items-center justify-center text-sm font-semibold shrink-0">
           {senderName ? initials(senderName) : "AI"}
         </div>
 
-        <div className="max-w-[420px] rounded-xl bg-white border border-gray-200 px-5 py-4 shadow-sm">
+        <div className="min-w-0 max-w-[calc(100%-48px)] rounded-xl bg-white border border-gray-200 px-5 py-4 shadow-sm sm:max-w-[420px]">
           {senderName && !isTyping && (
             <p className="text-xs font-semibold text-gray-500 mb-1">{senderName}</p>
           )}
