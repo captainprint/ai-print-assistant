@@ -51,8 +51,8 @@ export default function ChatArea({
 
 
   return (
-    <section className="flex-1 overflow-y-auto">
-      <div className="max-w-[900px] mx-auto px-8 py-8 pb-6 space-y-6">
+    <section className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
+      <div className="mx-auto min-w-0 max-w-[900px] px-8 py-8 pb-6 space-y-6">
         {messages.map((message, index) => (
           <MessageBubble
             key={index}
