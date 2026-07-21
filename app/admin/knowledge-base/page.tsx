@@ -1,80 +1,164 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Upload } from "lucide-react";
-import KnowledgeFileCard from "@/components/admin/knowledge-base/KnowledgeFileCard";
+import { Loader2, Upload } from "lucide-react";
+import KnowledgeFileCard, {
+    DisplayKnowledgeFile,
+} from "@/components/admin/knowledge-base/KnowledgeFileCard";
+import {
+    ApiError,
+    deleteKnowledgeFile,
+    listKnowledgeFiles,
+    replaceKnowledgeFile,
+    uploadKnowledgeFile,
+} from "@/lib/knowledgeBase";
 
-type KnowledgeFile = {
-    id: string;
-    name: string;
-    uploadedAt: string;
+const ALLOWED_EXTENSIONS = ["pdf", "doc", "docx", "xls", "xlsx", "csv", "txt"];
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB, mirrors the backend's multer limit
+
+function getExtension(filename: string): string {
+    return filename.split(".").pop()?.toLowerCase() ?? "";
+}
+
+function makeProcessingPlaceholder(file: File): DisplayKnowledgeFile {
+    return {
+        _id: `local-${crypto.randomUUID()}`,
+        originalFilename: file.name,
+        mimetype: file.type,
+        fileExtension: getExtension(file.name),
+        sizeBytes: file.size,
+        extractedChars: 0,
+        status: "processing",
+        parseError: null,
+        uploadedBy: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+    };
 }
 
 export default function KnowledgeBasePage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [files, setFiles] = useState<KnowledgeFile[]>([]);
-    const [fileToDelete, setFileToDelete] = useState<KnowledgeFile | null>(null);
-    const [duplicateFileName, setDuplicateFileName] = useState<string | null>(null);
+    const replaceInputRef = useRef<HTMLInputElement>(null);
+
+    const [files, setFiles] = useState<DisplayKnowledgeFile[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [listError, setListError] = useState("");
+    const [actionError, setActionError] = useState("");
+
+    const [fileToDelete, setFileToDelete] = useState<DisplayKnowledgeFile | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
+
+    const [duplicateConflict, setDuplicateConflict] = useState<{
+        existing: DisplayKnowledgeFile;
+        incoming: File;
+    } | null>(null);
+
     const [isDragging, setIsDragging] = useState(false);
     const [invalidFileMessage, setInvalidFileMessage] = useState<string | null>(null);
+    const [oversizedFileMessage, setOversizedFileMessage] = useState<string | null>(null);
+
+    const [replaceTarget, setReplaceTarget] = useState<DisplayKnowledgeFile | null>(null);
+
+    async function loadFiles() {
+        setLoading(true);
+        setListError("");
+        try {
+            const data = await listKnowledgeFiles();
+            setFiles(data.files);
+        } catch (err) {
+            setListError(err instanceof ApiError ? err.message : "Failed to load knowledge base files.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        loadFiles();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function handleUploadClick() {
         fileInputRef.current?.click();
     }
 
+    async function uploadOne(file: File) {
+        const placeholder = makeProcessingPlaceholder(file);
+        setFiles((current) => [placeholder, ...current]);
+
+        try {
+            const { file: saved } = await uploadKnowledgeFile(file);
+            setFiles((current) =>
+                current.map((f) => (f._id === placeholder._id ? saved : f))
+            );
+        } catch (err) {
+            setFiles((current) => current.filter((f) => f._id !== placeholder._id));
+            setActionError(
+                err instanceof ApiError ? err.message : `Failed to upload ${file.name}.`
+            );
+        }
+    }
+
+    async function replaceOne(existing: DisplayKnowledgeFile, file: File) {
+        setFiles((current) =>
+            current.map((f) => (f._id === existing._id ? { ...f, status: "processing" } : f))
+        );
+
+        try {
+            const { file: saved } = await replaceKnowledgeFile(existing._id, file);
+            setFiles((current) => current.map((f) => (f._id === existing._id ? saved : f)));
+        } catch (err) {
+            setFiles((current) => current.map((f) => (f._id === existing._id ? existing : f)));
+            setActionError(
+                err instanceof ApiError ? err.message : `Failed to replace ${existing.originalFilename}.`
+            );
+        }
+    }
+
     function processFiles(selectedFiles: File[]) {
-        const allowedExtensions = [
-            "pdf",
-            "doc",
-            "docx",
-            "xls",
-            "xlsx",
-            "csv",
-            "txt",
-        ];
+        setActionError("");
 
-        const validFiles = selectedFiles.filter((file) => {
-            const extension = file.name.split(".").pop()?.toLowerCase();
-
-            return extension && allowedExtensions.includes(extension);
-        });
-
-        const invalidFiles = selectedFiles.filter((file) => {
-            const extension = file.name.split(".").pop()?.toLowerCase();
-
-            return !extension || !allowedExtensions.includes(extension);
-        });
-
-        const existingFileNames = new Set(
-            files.map((file) => file.name.toLowerCase())
+        const validFiles = selectedFiles.filter((file) =>
+            ALLOWED_EXTENSIONS.includes(getExtension(file.name))
+        );
+        const invalidFiles = selectedFiles.filter(
+            (file) => !ALLOWED_EXTENSIONS.includes(getExtension(file.name))
         );
 
-        const uniqueFiles = validFiles.filter(
-            (file) => !existingFileNames.has(file.name.toLowerCase())
+        const sizedFiles = validFiles.filter((file) => file.size <= MAX_FILE_SIZE_BYTES);
+        const oversizedFiles = validFiles.filter((file) => file.size > MAX_FILE_SIZE_BYTES);
+
+        const savedFiles = files.filter((f) => f.status !== "processing");
+        const existingByName = new Map(
+            savedFiles.map((f) => [f.originalFilename.toLowerCase(), f])
         );
 
-        const duplicateFiles = validFiles.filter((file) =>
-            existingFileNames.has(file.name.toLowerCase())
-        );
+        const uniqueFiles: File[] = [];
+        let firstConflict: { existing: DisplayKnowledgeFile; incoming: File } | null = null;
 
-        const newFiles: KnowledgeFile[] = uniqueFiles.map((file) => ({
-            id: crypto.randomUUID(),
-            name: file.name,
-            uploadedAt: new Date().toLocaleDateString("en-CA", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-            }),
-        }));
+        for (const file of sizedFiles) {
+            const existing = existingByName.get(file.name.toLowerCase());
+            if (existing) {
+                if (!firstConflict) firstConflict = { existing, incoming: file };
+            } else {
+                uniqueFiles.push(file);
+            }
+        }
 
-        setFiles((currentFiles) => [...newFiles, ...currentFiles]);
+        for (const file of uniqueFiles) {
+            uploadOne(file);
+        }
 
-        if (duplicateFiles.length > 0) {
-            setDuplicateFileName(
-                duplicateFiles.length === 1
-                    ? duplicateFiles[0].name
-                    : `${duplicateFiles.length} files`
+        if (firstConflict) {
+            setDuplicateConflict(firstConflict);
+        }
+
+        if (oversizedFiles.length > 0) {
+            setOversizedFileMessage(
+                oversizedFiles.length === 1
+                    ? oversizedFiles[0].name
+                    : `${oversizedFiles.length} files`
             );
         }
 
@@ -87,53 +171,76 @@ export default function KnowledgeBasePage() {
         }
     }
 
-    function handleFileChange(
-        event: React.ChangeEvent<HTMLInputElement>
-    ) {
+    function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
         const selectedFiles = event.target.files;
-
-        if (!selectedFiles) {
-            return;
-        }
-
+        if (!selectedFiles) return;
         processFiles(Array.from(selectedFiles));
-
         event.target.value = "";
     }
 
-    function handleRemoveFile(id: string) {
-        setFiles((currentFiles) =>
-            currentFiles.filter((file) => file.id !== id)
-        );
+    function handleReplaceFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const selectedFile = event.target.files?.[0];
+        event.target.value = "";
+        if (!selectedFile || !replaceTarget) return;
+
+        const target = replaceTarget;
+        setReplaceTarget(null);
+
+        const ext = getExtension(selectedFile.name);
+        if (!ALLOWED_EXTENSIONS.includes(ext)) {
+            setInvalidFileMessage(selectedFile.name);
+            return;
+        }
+        if (selectedFile.size > MAX_FILE_SIZE_BYTES) {
+            setOversizedFileMessage(selectedFile.name);
+            return;
+        }
+
+        replaceOne(target, selectedFile);
     }
 
-    function handleDragOver(
-        event: React.DragEvent<HTMLDivElement>
-    ) {
+    function handleReplaceClick(file: DisplayKnowledgeFile) {
+        setReplaceTarget(file);
+        // Defer to next tick so the ref's accept attribute (if ever made
+        // extension-specific) and ref itself are ready before click().
+        requestAnimationFrame(() => replaceInputRef.current?.click());
+    }
+
+    function handleDragOver(event: React.DragEvent<HTMLDivElement>) {
         event.preventDefault();
         setIsDragging(true);
     }
 
-    function handleDragLeave(
-        event: React.DragEvent<HTMLDivElement>
-    ) {
+    function handleDragLeave(event: React.DragEvent<HTMLDivElement>) {
         event.preventDefault();
         setIsDragging(false);
     }
 
-    function handleDrop(
-        event: React.DragEvent<HTMLDivElement>
-    ) {
+    function handleDrop(event: React.DragEvent<HTMLDivElement>) {
         event.preventDefault();
         setIsDragging(false);
 
         const droppedFiles = Array.from(event.dataTransfer.files);
-
-        if (droppedFiles.length === 0) {
-            return;
-        }
+        if (droppedFiles.length === 0) return;
 
         processFiles(droppedFiles);
+    }
+
+    async function handleConfirmDelete() {
+        if (!fileToDelete) return;
+        setDeleting(true);
+        setDeleteError("");
+        try {
+            await deleteKnowledgeFile(fileToDelete._id);
+            setFiles((current) => current.filter((f) => f._id !== fileToDelete._id));
+            setFileToDelete(null);
+        } catch (err) {
+            setDeleteError(
+                err instanceof ApiError ? err.message : "Failed to delete file. Try again."
+            );
+        } finally {
+            setDeleting(false);
+        }
     }
 
     return (
@@ -150,6 +257,12 @@ export default function KnowledgeBasePage() {
                     </p>
                 </div>
 
+                {actionError && (
+                    <div className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+                        {actionError}
+                    </div>
+                )}
+
                 <input
                     ref={fileInputRef}
                     type="file"
@@ -157,6 +270,14 @@ export default function KnowledgeBasePage() {
                     className="hidden"
                     accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx"
                     onChange={handleFileChange}
+                />
+
+                <input
+                    ref={replaceInputRef}
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx"
+                    onChange={handleReplaceFileChange}
                 />
 
                 <div
@@ -198,13 +319,27 @@ export default function KnowledgeBasePage() {
                     </button>
                 </div>
 
-                {files.length > 0 && (
+                {loading && (
+                    <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
+                        <Loader2 size={18} className="animate-spin" />
+                        Loading files…
+                    </div>
+                )}
+
+                {!loading && listError && (
+                    <div className="mt-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+                        {listError}
+                    </div>
+                )}
+
+                {!loading && !listError && files.length > 0 && (
                     <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                         {files.map((file) => (
                             <KnowledgeFileCard
-                                key={file.id}
+                                key={file._id}
                                 file={file}
-                                onRemove={(file) => setFileToDelete(file)}
+                                onRemove={(f) => setFileToDelete(f)}
+                                onReplace={handleReplaceClick}
                             />
                         ))}
                     </div>
@@ -220,28 +355,37 @@ export default function KnowledgeBasePage() {
                             <p className="mt-2 text-sm text-gray-500">
                                 Are you sure you want to delete{" "}
                                 <span className="font-medium text-gray-900">
-                                    {fileToDelete.name}
+                                    {fileToDelete.originalFilename}
                                 </span>
                                 ? This action cannot be undone.
                             </p>
 
+                            {deleteError && (
+                                <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                                    {deleteError}
+                                </p>
+                            )}
+
                             <div className="mt-6 flex justify-end gap-3">
                                 <button
                                     type="button"
-                                    onClick={() => setFileToDelete(null)}
-                                    className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                    onClick={() => {
+                                        setFileToDelete(null);
+                                        setDeleteError("");
+                                    }}
+                                    disabled={deleting}
+                                    className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>
 
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        handleRemoveFile(fileToDelete.id);
-                                        setFileToDelete(null);
-                                    }}
-                                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                                    onClick={handleConfirmDelete}
+                                    disabled={deleting}
+                                    className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
                                 >
+                                    {deleting && <Loader2 size={14} className="animate-spin" />}
                                     Delete
                                 </button>
                             </div>
@@ -249,7 +393,7 @@ export default function KnowledgeBasePage() {
                     </div>
                 )}
 
-                {duplicateFileName && (
+                {duplicateConflict && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
                         <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
                             <h3 className="text-lg font-semibold text-gray-900">
@@ -258,18 +402,30 @@ export default function KnowledgeBasePage() {
 
                             <p className="mt-2 text-sm text-gray-500">
                                 <span className="font-medium text-gray-900">
-                                    {duplicateFileName}
+                                    {duplicateConflict.existing.originalFilename}
                                 </span>{" "}
-                                is already in the Knowledge Base and  cannot be uploaded again.
+                                is already in the Knowledge Base. You can replace its contents
+                                with the new file, or cancel this upload.
                             </p>
 
-                            <div className="mt-6 flex justify-end">
+                            <div className="mt-6 flex justify-end gap-3">
                                 <button
                                     type="button"
-                                    onClick={() => setDuplicateFileName(null)}
+                                    onClick={() => setDuplicateConflict(null)}
+                                    className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        replaceOne(duplicateConflict.existing, duplicateConflict.incoming);
+                                        setDuplicateConflict(null);
+                                    }}
                                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                                 >
-                                    Okay
+                                    Replace instead
                                 </button>
                             </div>
                         </div>
@@ -298,6 +454,33 @@ export default function KnowledgeBasePage() {
                                 <button
                                     type="button"
                                     onClick={() => setInvalidFileMessage(null)}
+                                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                                >
+                                    Okay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {oversizedFileMessage && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+                        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                File Too Large
+                            </h3>
+
+                            <p className="mt-2 text-sm text-gray-500">
+                                <span className="font-medium text-gray-900">
+                                    {oversizedFileMessage}
+                                </span>{" "}
+                                is larger than the 10MB limit.
+                            </p>
+
+                            <div className="mt-6 flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => setOversizedFileMessage(null)}
                                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                                 >
                                     Okay
