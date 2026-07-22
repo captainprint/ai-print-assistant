@@ -16,7 +16,7 @@ export default function ConversationHeader({
     showBackButton,
     onToggleCustomerInfo,
 }: ConversationHeaderProps) {
-    const name = conversation?.customerProfile?.name || (conversation ? "Unknown customer" : undefined);
+    const name = conversation?.customerProfile?.name || (conversation ? "Unknown-User" : undefined);
 
     return (
         <header className="flex min-w-0 items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-3 md:px-6 md:py-4">

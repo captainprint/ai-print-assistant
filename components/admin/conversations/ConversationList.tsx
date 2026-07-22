@@ -63,7 +63,7 @@ export default function ConversationList({
         <ConversationCard
           key={conversation.sessionId}
           id={conversation.sessionId}
-          name={conversation.customerProfile?.name || "Unknown customer"}
+          name={conversation.customerProfile?.name || "Unknown-User"}
           initials={initialsFromName(conversation.customerProfile?.name)}
           time={relativeTime(conversation.lastActivityAt)}
           message={conversation.preview || "No messages yet"}

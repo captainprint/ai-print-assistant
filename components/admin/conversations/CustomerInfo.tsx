@@ -179,7 +179,7 @@ export default function CustomerInfo({ sessionId, refreshSignal, onConversationC
               </div>
 
               <h3 className="mt-3 text-[15px] font-semibold text-gray-800">
-                {name || "Unknown customer"}
+                {name || "Unknown-User"}
               </h3>
 
               <div className="mt-2">

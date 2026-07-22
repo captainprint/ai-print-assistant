@@ -114,7 +114,7 @@ export function initialsFromName(name?: string | null): string {
 }
 
 export function mergeMessages(conversation: ConversationDetail): MergedMessage[] {
-  const customerName = conversation.customerProfile?.name || "Customer";
+  const customerName = conversation.customerProfile?.name || "Unknown-User";
   const customerInitials = initialsFromName(conversation.customerProfile?.name);
 
   const fromMessages: MergedMessage[] = conversation.messages
