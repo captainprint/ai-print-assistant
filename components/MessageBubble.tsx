@@ -60,7 +60,7 @@ export default function MessageBubble({
           )}
 
           {!isTyping && (
-            <p className="text-xs text-gray-500 mt-3">
+            <p className="text-xs text-gray-500 mt-3" suppressHydrationWarning>
               {time}
             </p>
           )}
@@ -74,7 +74,7 @@ export default function MessageBubble({
       <div className="max-w-[320px] rounded-xl bg-[#344054] px-5 py-4 shadow-sm break-words">
         <p className="text-white">{message}</p>
 
-        <p className="text-xs text-gray-200 mt-3">
+        <p className="text-xs text-gray-200 mt-3" suppressHydrationWarning>
           {time}
         </p>
       </div>

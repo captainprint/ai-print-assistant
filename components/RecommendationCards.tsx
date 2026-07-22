@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, ExternalLink } from "lucide-react";
 import type { ChatRecommendation, MatchedImageGroup } from "@/lib/chat";
 
 type Props = {
@@ -56,6 +56,18 @@ function RecommendationCard({
               </span>
             ))}
           </div>
+        )}
+
+        {recommendation.productUrl && (
+          <a
+            href={recommendation.productUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#3157F6] hover:underline"
+          >
+            View product
+            <ExternalLink size={12} />
+          </a>
         )}
       </div>
     </div>

@@ -14,6 +14,7 @@ export type ChatRecommendation = {
   explanation: string;
   priceRange: string;
   tags: string[];
+  productUrl: string | null;
 };
 
 export type MatchedImage = {
@@ -36,7 +37,13 @@ export type SendMessageResponse = {
   images: MatchedImageGroup[];
 };
 
-type RawSessionMessage = { role: "user" | "assistant" | "system"; content: string; timestamp: string };
+type RawSessionMessage = {
+  role: "user" | "assistant" | "system";
+  content: string;
+  timestamp: string;
+  recommendations?: ChatRecommendation[];
+  images?: MatchedImageGroup[];
+};
 type RawStaffReply = { message: string; staffName: string; timestamp: string };
 type RawCustomerReply = { message: string; timestamp: string };
 
@@ -176,7 +183,14 @@ type MergeableConversation = {
  * either way, a staff reply must be visible once it's happened.
  */
 export function mergeConversationMessages(conversation: MergeableConversation): Message[] {
-  type Timed = { role: "ai" | "user"; message: string; timestamp: string; senderName?: string };
+  type Timed = {
+    role: "ai" | "user";
+    message: string;
+    timestamp: string;
+    senderName?: string;
+    recommendations?: ChatRecommendation[];
+    images?: MatchedImageGroup[];
+  };
 
   const fromMessages: Timed[] = conversation.messages
     .filter((m) => m.role !== "system")
@@ -184,6 +198,8 @@ export function mergeConversationMessages(conversation: MergeableConversation): 
       role: m.role === "user" ? "user" : "ai",
       message: m.content,
       timestamp: m.timestamp,
+      recommendations: m.recommendations,
+      images: m.images,
     }));
 
   const fromStaff: Timed[] = conversation.staffReplies.map((r) => ({
@@ -201,10 +217,12 @@ export function mergeConversationMessages(conversation: MergeableConversation): 
 
   return [...fromMessages, ...fromStaff, ...fromCustomer]
     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-    .map(({ role, message, timestamp, senderName }) => ({
+    .map(({ role, message, timestamp, senderName, recommendations, images }) => ({
       role,
       message,
       time: formatTime(timestamp),
       senderName,
+      recommendations,
+      images,
     }));
 }
