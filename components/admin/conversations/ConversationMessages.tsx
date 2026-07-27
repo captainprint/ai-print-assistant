@@ -1,16 +1,8 @@
 import MessageBubble from "./MessageBubble";
-
-type Message = {
-  id: string;
-  sender: "customer" | "ai" | "admin";
-  senderName: string;
-  initials: string;
-  message: string;
-  time: string;
-};
+import type { MergedMessage } from "@/lib/conversations";
 
 type ConversationMessagesProps = {
-  messages: Message[];
+  messages: MergedMessage[];
 };
 
 export default function ConversationMessages({
@@ -33,6 +25,8 @@ export default function ConversationMessages({
             initials={message.initials}
             message={message.message}
             time={message.time}
+            recommendations={message.recommendations}
+            images={message.images}
           />
         ))}
       </div>

@@ -1,6 +1,47 @@
 import { UserRound } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import RecommendationCards from "./RecommendationCards";
 import type { ChatRecommendation, MatchedImageGroup } from "@/lib/chat";
+
+const markdownComponents = {
+  p: ({ children }: { children?: React.ReactNode }) => (
+    <p className="mb-2 last:mb-0">{children}</p>
+  ),
+  strong: ({ children }: { children?: React.ReactNode }) => (
+    <strong className="font-semibold">{children}</strong>
+  ),
+  ul: ({ children }: { children?: React.ReactNode }) => (
+    <ul className="mb-2 list-disc space-y-1 pl-5 last:mb-0">{children}</ul>
+  ),
+  ol: ({ children }: { children?: React.ReactNode }) => (
+    <ol className="mb-2 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>
+  ),
+  li: ({ children }: { children?: React.ReactNode }) => (
+    <li className="leading-relaxed">{children}</li>
+  ),
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-[#3157F6] underline hover:text-[#1f45d8]"
+    >
+      {children}
+    </a>
+  ),
+  code: ({ children }: { children?: React.ReactNode }) => (
+    <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[13px] text-gray-800">
+      {children}
+    </code>
+  ),
+  blockquote: ({ children }: { children?: React.ReactNode }) => (
+    <blockquote className="mb-2 border-l-2 border-gray-300 pl-3 italic text-gray-600 last:mb-0">
+      {children}
+    </blockquote>
+  ),
+};
 
 type Props = {
   role: "ai" | "user";
@@ -50,9 +91,14 @@ export default function MessageBubble({
               <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0.3s]" />
             </div>
           ) : (
-            <p className="text-[16px] leading-relaxed text-gray-900">
-              {message}
-            </p>
+            <div className="text-[16px] leading-relaxed text-gray-900">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, remarkBreaks]}
+                components={markdownComponents}
+              >
+                {message}
+              </ReactMarkdown>
+            </div>
           )}
 
           {!isTyping && recommendations && recommendations.length > 0 && (
@@ -72,7 +118,7 @@ export default function MessageBubble({
   return (
     <div className="flex justify-end items-start gap-3">
       <div className="max-w-[320px] rounded-xl bg-[#344054] px-5 py-4 shadow-sm break-words">
-        <p className="text-white">{message}</p>
+        <p className="whitespace-pre-wrap break-words text-white">{message}</p>
 
         <p className="text-xs text-gray-200 mt-3" suppressHydrationWarning>
           {time}

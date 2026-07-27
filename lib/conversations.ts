@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/api";
+import type { ChatRecommendation, MatchedImageGroup } from "@/lib/chat";
 
 export type CustomerProfile = {
   productType?: string | null;
@@ -34,7 +35,13 @@ export type ConversationSummary = {
   lastActivityAt: string;
 };
 
-type RawMessage = { role: "user" | "assistant" | "system"; content: string; timestamp: string };
+type RawMessage = {
+  role: "user" | "assistant" | "system";
+  content: string;
+  timestamp: string;
+  recommendations?: ChatRecommendation[];
+  images?: MatchedImageGroup[];
+};
 type RawStaffReply = { message: string; staffId?: string | null; staffName: string; timestamp: string };
 type RawCustomerReply = { message: string; timestamp: string };
 
@@ -71,6 +78,8 @@ export type MergedMessage = {
   message: string;
   time: string;
   timestamp: string;
+  recommendations?: ChatRecommendation[];
+  images?: MatchedImageGroup[];
 };
 
 export class ApiError extends Error {
@@ -127,6 +136,8 @@ export function mergeMessages(conversation: ConversationDetail): MergedMessage[]
       message: m.content,
       time: formatTime(m.timestamp),
       timestamp: m.timestamp,
+      recommendations: m.recommendations,
+      images: m.images,
     }));
 
   const fromStaff: MergedMessage[] = conversation.staffReplies.map((r, i) => ({
