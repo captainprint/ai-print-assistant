@@ -17,6 +17,7 @@ import {
 
 import { getInitials } from "@/lib/adminAuth";
 import type { AdminUser } from "@/lib/adminAuth";
+import ChangePasswordDialog from "@/components/admin/ChangePasswordDialog";
 
 type AdminSidebarProps = {
   onLogout: () => void;
@@ -36,6 +37,7 @@ const USER_NAV_ITEMS = [
 
 export default function AdminSidebar({ onLogout, user }: AdminSidebarProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   const pathname = usePathname();
 
@@ -76,7 +78,13 @@ export default function AdminSidebar({ onLogout, user }: AdminSidebarProps) {
                 </p>
               </div>
 
-              <button className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <button
+                onClick={() => {
+                  setIsUserMenuOpen(false);
+                  setIsChangePasswordOpen(true);
+                }}
+                className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
                 <KeyRound size={16} />
                 Change Password
               </button>
@@ -129,7 +137,13 @@ export default function AdminSidebar({ onLogout, user }: AdminSidebarProps) {
         <div className="relative hidden px-3 pb-5 md:block">
           {isUserMenuOpen && (
             <div className="absolute bottom-[72px] left-3 right-3 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
-              <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <button
+                onClick={() => {
+                  setIsUserMenuOpen(false);
+                  setIsChangePasswordOpen(true);
+                }}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
                 <KeyRound size={16} />
                 Change password
               </button>
@@ -164,6 +178,11 @@ export default function AdminSidebar({ onLogout, user }: AdminSidebarProps) {
           </button>
         </div>
       </div>
+
+      <ChangePasswordDialog
+        open={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+      />
     </aside>
   );
 }
