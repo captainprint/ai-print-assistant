@@ -166,7 +166,7 @@ export default function AdminUsersPage() {
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Users</h2>
             <p className="mt-1 text-sm text-gray-500">
-              Manage staff users and access.
+              Manage users and access.
             </p>
           </div>
 
