@@ -1,12 +1,17 @@
 import MessageBubble from "./MessageBubble";
+import ConversationSummary from "./ConversationSummary";
 import type { MergedMessage } from "@/lib/conversations";
 
 type ConversationMessagesProps = {
   messages: MergedMessage[];
+  summary?: string | null;
+  summaryGeneratedAt?: string | null;
 };
 
 export default function ConversationMessages({
   messages,
+  summary,
+  summaryGeneratedAt,
 }: ConversationMessagesProps) {
   return (
     <div className="min-h-full bg-[#f6f7f9] px-4 py-6 md:px-6">
@@ -30,6 +35,12 @@ export default function ConversationMessages({
           />
         ))}
       </div>
+
+      {summary && (
+        <div className="mt-6">
+          <ConversationSummary summary={summary} generatedAt={summaryGeneratedAt ?? null} />
+        </div>
+      )}
     </div>
   );
 }

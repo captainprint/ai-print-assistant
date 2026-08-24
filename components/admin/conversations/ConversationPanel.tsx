@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import ConversationHeader from "./ConversationHeader";
 import ConversationMessages from "./ConversationMessages";
+import ConversationSummary from "./ConversationSummary";
 import ReplyComposer from "./ReplyComposer";
 import CustomerInfo from "./CustomerInfo";
 import AssignmentGate from "./AssignmentGate";
@@ -136,7 +137,11 @@ export default function ConversationPanel({
               Conversation not available yet.
             </div>
           ) : (
-            <ConversationMessages messages={messages} />
+            <ConversationMessages
+              messages={messages}
+              summary={conversation?.summary}
+              summaryGeneratedAt={conversation?.summaryGeneratedAt}
+            />
           )}
           <div ref={messagesEndRef} />
         </div>

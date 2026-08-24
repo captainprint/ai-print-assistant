@@ -59,6 +59,8 @@ export type ConversationDetail = {
   handoffNotifiedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  summary: string | null;
+  summaryGeneratedAt: string | null;
 };
 
 export type AssignableUser = {
