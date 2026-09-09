@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
-  LayoutDashboard,
+  // LayoutDashboard,
   MessageSquare,
   Printer,
   Users,
@@ -25,7 +25,7 @@ type AdminSidebarProps = {
 };
 
 const ADMIN_NAV_ITEMS = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  // { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/conversations", label: "Conversations", icon: MessageSquare },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/knowledge-base", label: "Knowledge Base", icon: BookOpen },
