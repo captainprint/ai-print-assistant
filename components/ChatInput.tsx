@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
   onSendMessage: (message: string) => void;
@@ -43,7 +44,7 @@ export default function ChatInput({ onSendMessage, isAiTyping, disabled, disable
             placeholder={
               disabled
                 ? disabledReason || "This conversation has been handed off to our team."
-                : "Not sure what to print? Ask me anything....."
+                : "Not sure what to print? Ask me anything..."
             }
             className="flex-1 h-14 rounded-xl border-2 border-[#3157F6] px-4 text-[16px] text-gray-900 placeholder:text-[12px] placeholder:text-gray-500 outline-none disabled:bg-gray-50 disabled:text-gray-400"
           />
@@ -59,6 +60,18 @@ export default function ChatInput({ onSendMessage, isAiTyping, disabled, disable
             <Send size={24} strokeWidth={2.2} />
           </button>
         </div>
+
+        <p className="mt-2 text-center text-[11px] leading-4 tet-gray-400">
+          AI can make mistakes. Please double-check important product details before ordering.{" "}
+  If you have any questions, feel free to{" "}
+  <Link
+    href="https://captainprint.com/contact-us/"
+    className="text-[#3157F6] hover:underline"
+  >
+    contact us
+  </Link>
+  .
+        </p>
       </div>
     </footer>
   );
