@@ -67,9 +67,9 @@ export default function ChatInput({ onSendMessage, isAiTyping, disabled, disable
           </button>
         </div>
 
-        <p className="mt-2 text-center text-[11px] leading-4 tet-gray-400">
-          AI can make mistakes. Please double-check important product details before ordering.{" "}
-  If you have any questions, feel free to{" "}
+        <p className="mt-2 text-center text-[9px] leading-4 text-gray-500">
+          AI Print Assistant can make mistakes. Please double-check important product details before ordering.{" "}
+  If you have any questions, feel free to{" "} 
   <Link
     href="https://captainprint.com/contact-us/"
     className="text-[#3157F6] hover:underline"
