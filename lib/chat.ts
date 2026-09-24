@@ -1,4 +1,5 @@
 import type { Message } from "@/types/message";
+import { getToken } from "@/lib/adminAuth";
 // (type-only import — types/message.ts imports back from here, also type-only,
 // so this doesn't create a runtime circular dependency.)
 
@@ -59,6 +60,27 @@ export type SessionState = {
   customerReplies: RawCustomerReply[];
 };
 
+export const CHAT_LIMIT_CODE = "CHAT_LIMIT_REACHED";
+
+/** Error from the backend, keeping its machine-readable code (e.g. the chat limit). */
+export class ApiError extends Error {
+  status: number;
+  code?: string;
+  retryAfterSeconds?: number;
+
+  constructor(message: string, status: number, code?: string, retryAfterSeconds?: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.code = code;
+    this.retryAfterSeconds = retryAfterSeconds;
+  }
+}
+
+export function isChatLimitError(err: unknown): err is ApiError {
+  return err instanceof ApiError && err.code === CHAT_LIMIT_CODE;
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
@@ -71,7 +93,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
-    throw new Error(data.error || data.message || "Something went wrong. Please try again.");
+    throw new ApiError(
+      data.error || data.message || "Something went wrong. Please try again.",
+      res.status,
+      data.code,
+      typeof data.retryAfterSeconds === "number" ? data.retryAfterSeconds : undefined
+    );
   }
 
   return data as T;
@@ -113,9 +140,13 @@ export function clearLocalSession(): void {
 }
 
 export async function sendMessage(sessionId: string, message: string): Promise<SendMessageResponse> {
+  // A logged-in admin/user testing the chat sends their token so the backend
+  // words limit errors for staff ("Chat limit reached…") instead of customers.
+  const token = getToken();
   return request<SendMessageResponse>("/api/v1/chat/message", {
     method: "POST",
     body: JSON.stringify({ sessionId, message }),
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 }
 

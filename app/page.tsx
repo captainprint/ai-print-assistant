@@ -15,11 +15,17 @@ import {
   mergeConversationMessages,
   closeSession,
   clearLocalSession,
+  isChatLimitError,
+  ApiError,
 } from "@/lib/chat";
 import { usePolling } from "@/lib/usePolling";
+import { getToken } from "@/lib/adminAuth";
 import type { Message } from "@/types/message";
 
 const POLL_INTERVAL_MS = 10000;
+
+const CONNECTION_ERROR_MESSAGE =
+  "Sorry, we couldn't reach our assistant right now. Please try again, or [contact us](https://captainprint.com/contact-us/) for further assistance.";
 
 function getCurrentTime() {
   return new Date().toLocaleTimeString([], {
@@ -60,6 +66,15 @@ function HomeContent() {
   const [resumeSessionId, setResumeSessionId] = useState<string | null>(null);
   const [resumeError, setResumeError] = useState<string | null>(null);
   const [sendingReply, setSendingReply] = useState(false);
+  // Set while the backend's chat limit is in effect; the input stays
+  // disabled (in red) until `until`, then re-enables on its own.
+  const [chatLimit, setChatLimit] = useState<{ until: number; notice: string } | null>(null);
+
+  useEffect(() => {
+    if (!chatLimit) return;
+    const timer = setTimeout(() => setChatLimit(null), Math.max(0, chatLimit.until - Date.now()));
+    return () => clearTimeout(timer);
+  }, [chatLimit]);
 
   useEffect(() => {
     let cancelled = false;
@@ -192,7 +207,7 @@ function HomeContent() {
   }
 
   async function handleAiMessage(message: string) {
-    if (!sessionId || isAiTyping || isHumanRequired) return;
+    if (!sessionId || isAiTyping || isHumanRequired || chatLimit) return;
 
     const userMessage: Message = {
       role: "user",
@@ -224,12 +239,27 @@ function HomeContent() {
         setIsHumanRequired(true);
       }
     } catch (err) {
+      const limited = isChatLimitError(err);
+      // Backend errors are already customer-safe; anything else (network
+      // failure, etc.) gets the same friendly notice instead of "Failed to fetch".
       const errorMessage: Message = {
         role: "ai",
-        message: err instanceof Error ? err.message : "Something went wrong. Please try again.",
+        message: err instanceof ApiError ? err.message : CONNECTION_ERROR_MESSAGE,
         time: getCurrentTime(),
+        isError: true,
       };
       setMessages((prev) => [...prev.filter((m) => !m.isTyping), errorMessage]);
+      if (limited) {
+        setChatLimit({
+          until: Date.now() + (err.retryAfterSeconds ?? 60) * 1000,
+          // Staff (logged in) see the backend's plain "Chat limit reached…"
+          // text; customers get a neutral note (their message has a link,
+          // which a placeholder can't show).
+          notice: getToken()
+            ? err.message
+            : "We're having trouble responding right now. Please try again shortly.",
+        });
+      }
     } finally {
       setIsAiTyping(false);
     }
@@ -309,12 +339,15 @@ function HomeContent() {
         isAiTyping={
           resumeToken ? sendingReply : hasStaffReplied ? sendingHumanReply : isAiTyping
         }
-        disabled={resumeToken ? resumeStatus === "completed" : waitingForFirstReply}
+        disabled={resumeToken ? resumeStatus === "completed" : waitingForFirstReply || !!chatLimit}
         disabledReason={
           resumeToken
             ? "This conversation has been resolved."
+            : chatLimit && !waitingForFirstReply
+            ? chatLimit.notice
             : "Our team will be in touch by email shortly."
         }
+        isErrorState={!resumeToken && !!chatLimit && !waitingForFirstReply}
       />
     </main>
   );

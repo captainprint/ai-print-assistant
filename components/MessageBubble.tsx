@@ -43,6 +43,21 @@ const markdownComponents = {
   ),
 };
 
+// Error notices contain a "contact us" link — keep it readable on red.
+const errorMarkdownComponents = {
+  ...markdownComponents,
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-semibold text-red-800 underline hover:text-red-900"
+    >
+      {children}
+    </a>
+  ),
+};
+
 type Props = {
   role: "ai" | "user";
   message: string;
@@ -51,6 +66,7 @@ type Props = {
   recommendations?: ChatRecommendation[];
   images?: MatchedImageGroup[];
   senderName?: string;
+  isError?: boolean;
 };
 
 function initials(name: string) {
@@ -71,7 +87,29 @@ export default function MessageBubble({
   recommendations,
   images,
   senderName,
+  isError,
 }: Props) {
+  if (role === "ai" && isError) {
+    return (
+      <div className="flex min-w-0 max-w-full items-start gap-3" role="alert">
+        <div className="w-9 h-9 rounded-full bg-red-600 text-white flex items-center justify-center text-sm font-semibold shrink-0">
+          !
+        </div>
+
+        <div className="min-w-0 max-w-[calc(100%-48px)] rounded-xl bg-red-50 border border-red-300 px-5 py-4 shadow-sm sm:max-w-[420px]">
+          <div className="text-[16px] leading-relaxed font-medium text-red-700">
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} components={errorMarkdownComponents}>
+              {message}
+            </ReactMarkdown>
+          </div>
+          <p className="text-xs text-red-400 mt-3" suppressHydrationWarning>
+            {time}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (role === "ai") {
     return (
       <div className="flex min-w-0 max-w-full items-start gap-3">

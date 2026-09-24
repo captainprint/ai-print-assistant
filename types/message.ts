@@ -10,4 +10,6 @@ export type Message = {
   images?: MatchedImageGroup[];
   /** Staff member's name, when this "ai"-slot message is actually a human reply. */
   senderName?: string;
+  /** System notice shown in red (e.g. "Chat limit reached"). */
+  isError?: boolean;
 };

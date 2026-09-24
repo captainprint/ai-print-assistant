@@ -9,9 +9,11 @@ type Props = {
   isAiTyping: boolean;
   disabled?: boolean;
   disabledReason?: string;
+  /** Renders the disabled state in red, e.g. while the chat limit is in effect. */
+  isErrorState?: boolean;
 };
 
-export default function ChatInput({ onSendMessage, isAiTyping, disabled, disabledReason }: Props) {
+export default function ChatInput({ onSendMessage, isAiTyping, disabled, disabledReason, isErrorState }: Props) {
   const [input, setInput] = useState("");
 
   const handleSubmit = () => {
@@ -46,7 +48,11 @@ export default function ChatInput({ onSendMessage, isAiTyping, disabled, disable
                 ? disabledReason || "This conversation has been handed off to our team."
                 : "Not sure what to print? Ask me anything..."
             }
-            className="flex-1 h-14 rounded-xl border-2 border-[#3157F6] px-4 text-[16px] text-gray-900 placeholder:text-[12px] placeholder:text-gray-500 outline-none disabled:bg-gray-50 disabled:text-gray-400"
+            className={`flex-1 h-14 rounded-xl border-2 px-4 text-[16px] text-gray-900 placeholder:text-[12px] outline-none disabled:text-gray-400 ${
+              isErrorState
+                ? "border-red-500 bg-red-50 placeholder:text-red-600 placeholder:font-medium disabled:bg-red-50 cursor-not-allowed"
+                : "border-[#3157F6] placeholder:text-gray-500 disabled:bg-gray-50"
+            }`}
           />
 
           <button

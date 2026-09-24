@@ -63,6 +63,7 @@ export default function ChatArea({
             recommendations={message.recommendations}
             images={message.images}
             senderName={message.senderName}
+            isError={message.isError}
           />
         ))}
 
