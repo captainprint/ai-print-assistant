@@ -16,6 +16,7 @@ export type ChatRecommendation = {
   priceRange: string;
   tags: string[];
   productUrl: string | null;
+  contactUrl?: string | null;
 };
 
 export type MatchedImage = {

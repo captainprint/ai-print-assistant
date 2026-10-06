@@ -95,14 +95,14 @@ function RecommendationCard({
           </div>
         )}
 
-        {recommendation.productUrl && (
+        {(recommendation.productUrl || recommendation.contactUrl) && (
           <a
-            href={recommendation.productUrl}
+            href={(recommendation.productUrl || recommendation.contactUrl)!}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#3157F6] hover:underline"
           >
-            View product
+            {recommendation.productUrl ? "View product" : "Contact Us"}
             <ExternalLink size={12} />
           </a>
         )}
