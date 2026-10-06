@@ -80,7 +80,9 @@ function RecommendationCard({
 
         <p className="mt-2 text-xs leading-relaxed text-gray-600">{recommendation.explanation}</p>
 
-        <p className="mt-2 text-sm font-semibold text-[#3157F6]">{recommendation.priceRange}</p>
+        <p className="mt-2 text-sm font-semibold text-[#3157F6]">
+          <PriceText text={recommendation.priceRange} contactUrl={recommendation.contactUrl} />
+        </p>
 
         {recommendation.tags.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
@@ -95,19 +97,41 @@ function RecommendationCard({
           </div>
         )}
 
-        {(recommendation.productUrl || recommendation.contactUrl) && (
+        {recommendation.productUrl && (
           <a
-            href={(recommendation.productUrl || recommendation.contactUrl)!}
+            href={recommendation.productUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#3157F6] hover:underline"
           >
-            {recommendation.productUrl ? "View product" : "Contact Us"}
+            View product
             <ExternalLink size={12} />
           </a>
         )}
       </div>
     </div>
+  );
+}
+
+// Turns a leading "Contact us" in the price text into a link to the contact
+// page, e.g. "Contact us for pricing and more details." Any other text
+// (such as a verified price) is shown unchanged.
+function PriceText({ text, contactUrl }: { text: string; contactUrl?: string | null }) {
+  const match = contactUrl ? text.match(/^contact us/i) : null;
+  if (!match) return <>{text}</>;
+
+  return (
+    <>
+      <a
+        href={contactUrl!}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:no-underline"
+      >
+        {match[0]}
+      </a>
+      {text.slice(match[0].length)}
+    </>
   );
 }
 
