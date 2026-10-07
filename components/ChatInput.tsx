@@ -53,8 +53,8 @@ export default function ChatInput({ onSendMessage, isAiTyping, disabled, disable
             onClick={handleSubmit}
             disabled={isDisabled}
             className={`w-14 h-14 rounded-xl text-white flex items-center justify-center transition shrink-0 ${isDisabled
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-[#3157F6] hover:bg-[#2347d8] cursor-pointer"
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-[#3157F6] hover:bg-[#2347d8] cursor-pointer"
               }`}
           >
             <Send size={24} strokeWidth={2.2} />
@@ -63,14 +63,16 @@ export default function ChatInput({ onSendMessage, isAiTyping, disabled, disable
 
         <p className="mt-2 text-center text-[9px] leading-4 text-gray-500">
           AI Print Assistant can make mistakes. Please double-check important product details before ordering.{" "}
-  If you have any questions, feel free to{" "} 
-  <Link
-    href="https://captainprint.com/contact-us/"
-    className="text-[#3157F6] hover:underline"
-  >
-    contact us
-  </Link>
-  .
+          If you have any questions, feel free to{" "}
+          <Link
+            href="https://captainprint.com/contact-us/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#3157F6] hover:underline"
+          >
+            contact us
+          </Link>
+          .
         </p>
       </div>
     </footer>
