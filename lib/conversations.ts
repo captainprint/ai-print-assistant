@@ -242,3 +242,30 @@ export async function unassignConversation(
 export async function listAssignableUsers(): Promise<{ users: AssignableUser[] }> {
   return request(`/api/v1/handoff/assignable-users`);
 }
+
+export type TrashedConversation = ConversationSummary & {
+  deletedAt: string;
+  deletedBy: { _id: string; fullName: string } | null;
+};
+
+// Admin only — moves a conversation to the trash (recoverable).
+export async function deleteConversation(
+  sessionId: string
+): Promise<{ success: boolean; deletedAt: string }> {
+  return request(`/api/v1/handoff/conversations/${sessionId}`, { method: "DELETE" });
+}
+
+export async function listTrashedConversations(
+  page = 1
+): Promise<{ conversations: TrashedConversation[]; total: number; page: number; pages: number }> {
+  return request(`/api/v1/handoff/trash?page=${page}&limit=20`);
+}
+
+export async function restoreConversation(sessionId: string): Promise<{ success: boolean }> {
+  return request(`/api/v1/handoff/trash/${sessionId}/restore`, { method: "POST" });
+}
+
+// Admin only — permanently deletes a trashed conversation. Cannot be undone.
+export async function deleteConversationForever(sessionId: string): Promise<{ success: boolean }> {
+  return request(`/api/v1/handoff/trash/${sessionId}`, { method: "DELETE" });
+}

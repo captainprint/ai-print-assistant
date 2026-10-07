@@ -12,7 +12,8 @@ import {
   KeyRound,
   LogOut,
   ChevronUp,
-  BookOpen
+  BookOpen,
+  Trash2,
 } from "lucide-react";
 
 import { getInitials } from "@/lib/adminAuth";
@@ -29,6 +30,7 @@ const ADMIN_NAV_ITEMS = [
   { href: "/admin/conversations", label: "Conversations", icon: MessageSquare },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/knowledge-base", label: "Knowledge Base", icon: BookOpen },
+  { href: "/admin/trash", label: "Trash", icon: Trash2 },
 ];
 
 const USER_NAV_ITEMS = [

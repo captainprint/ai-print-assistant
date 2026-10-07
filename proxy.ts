@@ -5,6 +5,7 @@ const ADMIN_PATHS = [
   "/admin/conversations",
   "/admin/settings",
   "/admin/users",
+  "/admin/trash",
 ];
 
 const USER_PATHS = ["/user/conversations"];

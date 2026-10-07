@@ -4,24 +4,37 @@ import { useEffect, useRef, useState } from "react";
 import ConversationSearch from "./ConversationSearch";
 import StatusFilter, { type StatusFilterValue } from "./StatusFilter";
 import ConversationList from "./ConversationList";
+import DeleteConversationModal from "./DeleteConversationModal";
 import { listConversations, type ConversationSummary } from "@/lib/conversations";
 
 type ConversationSidebarProps = {
     selectedConversationId?: string | null;
     onSelectConversation?: (id: string) => void;
     refreshSignal?: number;
+    // Admin only — shows the three-dots delete menu on each conversation.
+    canDelete?: boolean;
+    onConversationDeleted?: (id: string) => void;
 };
 
 export default function ConversationSidebar({
     selectedConversationId,
     onSelectConversation,
     refreshSignal,
+    canDelete = false,
+    onConversationDeleted,
 }: ConversationSidebarProps) {
     const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [conversations, setConversations] = useState<ConversationSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [conversationToDelete, setConversationToDelete] = useState<ConversationSummary | null>(null);
+
+    function handleDeleted(sessionId: string) {
+        setConversations((prev) => prev.filter((c) => c.sessionId !== sessionId));
+        setConversationToDelete(null);
+        onConversationDeleted?.(sessionId);
+    }
 
     useEffect(() => {
         let cancelled = false;
@@ -110,8 +123,17 @@ export default function ConversationSidebar({
                     searchQuery={searchQuery}
                     selectedConversationId={selectedConversationId}
                     onSelectConversation={onSelectConversation}
+                    onDeleteConversation={canDelete ? setConversationToDelete : undefined}
                 />
             </div>
+
+            {conversationToDelete && (
+                <DeleteConversationModal
+                    conversation={conversationToDelete}
+                    onCancel={() => setConversationToDelete(null)}
+                    onDeleted={handleDeleted}
+                />
+            )}
         </aside>
     );
 }

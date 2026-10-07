@@ -13,6 +13,7 @@ type ConversationListProps = {
   searchQuery: string;
   selectedConversationId?: string | null;
   onSelectConversation?: (id: string) => void;
+  onDeleteConversation?: (conversation: ConversationSummary) => void;
 };
 
 export default function ConversationList({
@@ -22,6 +23,7 @@ export default function ConversationList({
   searchQuery,
   selectedConversationId,
   onSelectConversation,
+  onDeleteConversation,
 }: ConversationListProps) {
   if (loading) {
     return (
@@ -70,6 +72,7 @@ export default function ConversationList({
           status={deriveStatus(conversation)}
           active={conversation.sessionId === selectedConversationId}
           onClick={() => onSelectConversation?.(conversation.sessionId)}
+          onDelete={onDeleteConversation ? () => onDeleteConversation(conversation) : undefined}
         />
       ))}
     </div>

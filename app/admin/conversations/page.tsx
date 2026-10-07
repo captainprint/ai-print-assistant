@@ -36,6 +36,10 @@ function AdminConversationsContent() {
           selectedConversationId={selectedConversationId}
             onSelectConversation={(id) => setSelectedConversationId(id)}
             refreshSignal={refreshSignal}
+            canDelete
+            onConversationDeleted={(id) => {
+              if (id === selectedConversationId) setSelectedConversationId(null);
+            }}
           />
         </div>
 
