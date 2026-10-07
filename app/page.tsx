@@ -1,13 +1,14 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import ChatArea from "@/components/ChatArea";
 import ChatInput from "@/components/ChatInput";
 import {
   getOrCreateSessionId,
   getSession,
+  fetchSession,
   sendMessage,
   sendCustomerReplyBySession,
   resumeConversation,
@@ -16,7 +17,9 @@ import {
   closeSession,
   clearLocalSession,
   isChatLimitError,
+  isSessionDeletedError,
   ApiError,
+  type SendMessageResponse,
 } from "@/lib/chat";
 import { usePolling } from "@/lib/usePolling";
 import { getToken } from "@/lib/adminAuth";
@@ -47,6 +50,7 @@ const GREETING: Message = {
 };
 
 function HomeContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const resumeToken = searchParams.get("t");
 
@@ -89,6 +93,12 @@ function HomeContent() {
           setMessages(mergeConversationMessages(conversation));
         } catch (err) {
           if (cancelled) return;
+          if (isSessionDeletedError(err)) {
+            // Conversation was deleted by an admin — fall back to a fresh chat.
+            setMessages([GREETING]);
+            router.replace("/");
+            return;
+          }
           setResumeError(
             err instanceof Error
               ? err.message
@@ -117,7 +127,26 @@ function HomeContent() {
     return () => {
       cancelled = true;
     };
-  }, [resumeToken]);
+  }, [resumeToken, router]);
+
+  // Drops the current conversation and starts a brand new one — used when
+  // the customer closes their ticket, or an admin has deleted the conversation.
+  async function startFreshConversation(): Promise<string> {
+    clearLocalSession();
+    setMessages([GREETING]);
+    setIsHumanRequired(false);
+    setHasStaffReplied(false);
+    const id = await getOrCreateSessionId();
+    setSessionId(id);
+    return id;
+  }
+
+  // A magic link whose conversation was deleted — fall back to a fresh chat.
+  function leaveDeletedResume() {
+    setIsResuming(false);
+    setMessages([GREETING]);
+    router.replace("/");
+  }
 
   async function handleResumedReply(message: string) {
     if (!resumeToken || sendingReply || resumeStatus === "completed") return;
@@ -136,6 +165,10 @@ function HomeContent() {
       setResumeStatus(refreshed.status);
       setMessages(mergeConversationMessages(refreshed));
     } catch (err) {
+      if (isSessionDeletedError(err)) {
+        leaveDeletedResume();
+        return;
+      }
       const errorMessage: Message = {
         role: "ai",
         message:
@@ -170,6 +203,13 @@ function HomeContent() {
         setHasStaffReplied(refreshed.staffReplies.length > 0);
       }
     } catch (err) {
+      if (isSessionDeletedError(err)) {
+        // Deleted by an admin — continue with the AI in a fresh conversation.
+        const freshId = await startFreshConversation();
+        setSendingHumanReply(false);
+        await runAiMessage(freshId, message);
+        return;
+      }
       const errorMessage: Message = {
         role: "ai",
         message:
@@ -198,32 +238,38 @@ function HomeContent() {
     if (resumeToken) {
       setResumeStatus("completed");
     } else {
-      clearLocalSession();
-      setMessages([GREETING]);
-      setIsHumanRequired(false);
-      setHasStaffReplied(false);
-      setSessionId(await getOrCreateSessionId());
+      await startFreshConversation();
     }
   }
 
   async function handleAiMessage(message: string) {
     if (!sessionId || isAiTyping || isHumanRequired || chatLimit) return;
+    await runAiMessage(sessionId, message);
+  }
 
+  async function runAiMessage(targetSessionId: string, message: string) {
     const userMessage: Message = {
       role: "user",
       message,
       time: getCurrentTime(),
     };
+    const typingMessage: Message = { role: "ai", message: "", time: "", isTyping: true };
 
     setIsAiTyping(true);
-    setMessages((prev) => [
-      ...prev,
-      userMessage,
-      { role: "ai", message: "", time: "", isTyping: true },
-    ]);
+    setMessages((prev) => [...prev, userMessage, typingMessage]);
 
     try {
-      const response = await sendMessage(sessionId, message);
+      let response: SendMessageResponse;
+      try {
+        response = await sendMessage(targetSessionId, message);
+      } catch (err) {
+        if (!isSessionDeletedError(err)) throw err;
+        // An admin deleted this conversation — carry the message over into
+        // a fresh one instead of showing an error.
+        const freshId = await startFreshConversation();
+        setMessages([GREETING, userMessage, typingMessage]);
+        response = await sendMessage(freshId, message);
+      }
 
       const aiMessage: Message = {
         role: "ai",
@@ -274,7 +320,9 @@ function HomeContent() {
         setResumeStatus(conversation.status);
         setMessages(mergeConversationMessages(conversation));
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (isSessionDeletedError(err)) leaveDeletedResume();
+      });
   }, POLL_INTERVAL_MS);
 
   // Poll the anonymous session once it's been escalated — same reasoning,
@@ -282,14 +330,15 @@ function HomeContent() {
   // synchronously so there's nothing to poll for before that.
   usePolling(() => {
     if (resumeToken || !sessionId || !isHumanRequired || sendingHumanReply) return;
-    getSession(sessionId)
+    fetchSession(sessionId)
       .then((session) => {
-        if (!session) return;
         setMessages(mergeConversationMessages(session));
         setIsHumanRequired(session.status === "human_required");
         setHasStaffReplied(session.staffReplies.length > 0);
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (isSessionDeletedError(err)) startFreshConversation().catch(() => {});
+      });
   }, POLL_INTERVAL_MS);
 
   // Once a staff member has replied, the customer keeps talking to them, not

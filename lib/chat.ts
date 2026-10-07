@@ -62,6 +62,9 @@ export type SessionState = {
 };
 
 export const CHAT_LIMIT_CODE = "CHAT_LIMIT_REACHED";
+// The backend sends this when an admin has deleted the conversation — the
+// widget should drop it and start a fresh one.
+export const SESSION_DELETED_CODE = "SESSION_DELETED";
 
 /** Error from the backend, keeping its machine-readable code (e.g. the chat limit). */
 export class ApiError extends Error {
@@ -80,6 +83,10 @@ export class ApiError extends Error {
 
 export function isChatLimitError(err: unknown): err is ApiError {
   return err instanceof ApiError && err.code === CHAT_LIMIT_CODE;
+}
+
+export function isSessionDeletedError(err: unknown): err is ApiError {
+  return err instanceof ApiError && err.code === SESSION_DELETED_CODE;
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -110,9 +117,14 @@ export async function createSession(): Promise<string> {
   return data.sessionId;
 }
 
+/** Like getSession, but throws — so callers can tell a deleted session apart from a network blip. */
+export async function fetchSession(sessionId: string): Promise<SessionState> {
+  return request<SessionState>(`/api/v1/chat/session/${sessionId}`);
+}
+
 export async function getSession(sessionId: string): Promise<SessionState | null> {
   try {
-    return await request<SessionState>(`/api/v1/chat/session/${sessionId}`);
+    return await fetchSession(sessionId);
   } catch {
     return null;
   }
